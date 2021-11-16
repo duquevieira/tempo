@@ -6,28 +6,30 @@ using UnityEngine.Playables;
 
 public class TimelineControl : MonoBehaviour
 {
-    public PlayableDirector playableDirector = null;
-    public TimelineAsset timelineAsset;
+    [SerializeField] private PlayableDirector playableDirector = null;
+ 
     
     // Start is called before the first frame update
     void Start()
     {
         playableDirector.time = 0;
+
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (Input.GetButtonDown("Time"))
             playableDirector.Resume();
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetButtonDown("Rewind"))
             playableDirector.Resume();
         double timeDifference = Time.deltaTime;
-        if (Input.GetKey(KeyCode.Return))
+        if (Input.GetButton("Rewind"))
         {
-            playableDirector.time -= timeDifference;
+            if(playableDirector.time > timeDifference)
+                playableDirector.time -= timeDifference;
         }
-        if (Input.GetKeyUp(KeyCode.Return))
+        if (Input.GetButtonUp("Rewind"))
             playableDirector.Pause();
     }
 }
