@@ -303,7 +303,7 @@ PlayableDirector:
   m_Enabled: 1
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: e3db9417f3f1428438177ca8b97f9589, type: 2}
-  m_InitialState: 1
+  m_InitialState: 0
   m_WrapMode: 0
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
@@ -312,6 +312,50 @@ PlayableDirector:
     value: {fileID: 28473170}
   m_ExposedReferences:
     m_References: []
+--- !u!114 &28473181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28473169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5dbf80773bf274d9abacbe79118e98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Events:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 28473175}
+        m_TargetAssemblyTypeName: TimelineControl, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Buttons:
+  - Click
+  Colliders:
+  - {fileID: 1975965948}
+--- !u!65 &28473182
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28473169}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.2708282, y: 1.5722678, z: 4.44377}
+  m_Center: {x: 0.02371025, y: 0.8335279, z: 0.09253287}
 --- !u!1001 &36297518
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2190,7 +2234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4010211675262112154, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 26.16
       objectReference: {fileID: 0}
     - target: {fileID: 4010211675262112154, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2198,7 +2242,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4010211675262112154, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -43.2
       objectReference: {fileID: 0}
     - target: {fileID: 4010211675262112154, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
       propertyPath: m_LocalRotation.w
@@ -18834,6 +18878,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4200802212075704, guid: 696d556a80bf28e46aa3eab92f05424f, type: 3}
   m_PrefabInstance: {fileID: 1966969053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1975965948 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1571733253942326, guid: 86b694ea228204845aa687fa6374b16a, type: 3}
+  m_PrefabInstance: {fileID: 400595889}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1987762429
 PrefabInstance:

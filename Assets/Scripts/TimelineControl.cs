@@ -7,6 +7,7 @@ using UnityEngine.Playables;
 public class TimelineControl : MonoBehaviour
 {
     [SerializeField] private PlayableDirector playableDirector = null;
+    
  
     
     // Start is called before the first frame update
@@ -31,5 +32,10 @@ public class TimelineControl : MonoBehaviour
         }
         if (Input.GetButtonUp("Rewind"))
             playableDirector.Pause();
+    }
+
+    public void Play()
+    {
+        playableDirector.Play();
     }
 }
