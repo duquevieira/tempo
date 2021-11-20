@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityStandardAssets.Characters.ThirdPerson;
 
 public class Pathfinding : MonoBehaviour
 {
@@ -14,10 +16,46 @@ public class Pathfinding : MonoBehaviour
     private GameObject[] nodesarray;
     [SerializeField] private float verticalModifier;
     [SerializeField] private float horizontalModifier;
+    [SerializeField] private NavMeshAgent playerNavMeshAgent;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private ThirdPersonCharacter character;
     [SerializeField] private SphereCollider nodeInclusionSphere;
     private int[] path;
     public LinkedList<GameObject> pathFound;
+
+    public void PrintAdjacency(LinkedList<Edge>[] adjacency)
+    {
+        foreach (LinkedList<Edge> node in adjacency)
+        {
+            String list = "node: ";
+            foreach (Edge e in node)
+            {
+                list = list + " " + e.destination;
+            }
+            Debug.Log(list);
+        }
+    }
+
+    public void PrintArray(int[] array)
+    {
+        String list = "path: ";
+        foreach (int i in array)
+        {
+            list = list + " " + i;
+        }
+        Debug.Log(list);
+    }
+    public void PrintQueue(PriorityQueuePair q)
+    {
+        String list = "queue: ("+ q.Length()+")";
+        Pair[] array = q.GiveArray();
+        for(int i = 0; i<=q.Length();i++)
+        {
+            list = list + "/ " + array[i].index+" "+ array[i].value;
+        }
+        Debug.Log(list);
+
+    }
 
     public class Edge
     {
@@ -36,15 +74,15 @@ public class Pathfinding : MonoBehaviour
 
     public class Pair
     {
-        public int value;
+        public float value;
         public int index;
 
-        public Pair(int value, int index)
+        public Pair(float value, int index)
         {
             this.value = value;
             this.index = index;
         }
-        public int CompareTo(Pair o)
+        public float CompareTo(Pair o)
         {
             return value - o.value;
         }
@@ -55,16 +93,26 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
-        public class PriorityQueuePair
+    public class PriorityQueuePair
     {
         static int length;
         static Pair[] h;
 
         public PriorityQueuePair(int size)
         {
-            length = 0;
+            length = -1;
             h = new Pair[size];
             h[0] = new Pair(int.MinValue,int.MinValue);
+        }
+
+        public Pair[] GiveArray()
+        {
+            return h;
+        }
+
+        public int Length()
+        {
+            return length;
         }
 
         static int Parent(int i)
@@ -79,7 +127,7 @@ public class Pathfinding : MonoBehaviour
 
         static int RightChild(int i)
         {
-            return ((2 * i) + 1);
+            return ((2 * i) + 2);
         }
 
         static void ShiftUp(int i)
@@ -198,7 +246,7 @@ public class Pathfinding : MonoBehaviour
 
         internal bool IsEmpty()
         {
-            return length <= 0;
+            return length < 0;
         }
 
         static void Swap(int i, int j)
@@ -219,10 +267,10 @@ public class Pathfinding : MonoBehaviour
     {
         float x1 = horizontalModifier*source.transform.position.x;
         float x2 = horizontalModifier * destination.transform.position.x;
-        float y1 = horizontalModifier * source.transform.position.y;
-        float y2 = horizontalModifier * destination.transform.position.y;
-        float z1 = verticalModifier*source.transform.position.z;
-        float z2 = verticalModifier*destination.transform.position.z;
+        float y1 = verticalModifier * source.transform.position.y;
+        float y2 = verticalModifier * destination.transform.position.y;
+        float z1 = horizontalModifier * source.transform.position.z;
+        float z2 = horizontalModifier * destination.transform.position.z;
         float weight = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
         return weight;
     }
@@ -250,104 +298,154 @@ public class Pathfinding : MonoBehaviour
             }
         }
         pathFound = new LinkedList<GameObject>();
+        PrintAdjacency(adjacencylist);
+        playerNavMeshAgent.updateRotation = false;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButton("Click"))
+        if (Input.GetButtonDown("Click"))
         {
             
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                if (nodes.ContainsKey(hit.transform.gameObject))
-                {
-
-                    int dest = nodes[hit.transform.gameObject];
-
-                    /*Collider[] objects = Physics.OverlapSphere(nodeInclusionSphere.transform.position, nodeInclusionSphere.radius, 10);
-                    
-                    int origin = nodes[objects[0].gameObject];*/
-                    int origin = 0;
-                    float maxDistance = float.MaxValue;
-                    foreach (GameObject collider in nodes.Keys)
-                    {
-                        GameObject source = nodeInclusionSphere.gameObject;
-                        GameObject destination = collider;
-                        float x1 = source.transform.position.x;
-                        float x2 = destination.transform.position.x;
-                        float y1 = source.transform.position.y;
-                        float y2 = destination.transform.position.y;
-                        float z1 = source.transform.position.z;
-                        float z2 = destination.transform.position.z;
-                        float distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
-                        if (distance <= maxDistance)
-                        {
-                            maxDistance = distance;
-                            origin = nodes[collider.gameObject];
-                        }
-                    }
-
-                    pathFound.Clear();
-
-                    bool[] selected = new bool[vertices];
-                    int[] length = new int[vertices];
-                    path = new int[vertices];
-                    PriorityQueuePair connected = new PriorityQueuePair(vertices);
-                    for (int v = 0; v < vertices; v++)
-                    {
-                        selected[v] = false;
-                        length[v] = int.MaxValue;
-                        path[v] = int.MinValue;
-                    }
-                    length[origin] = 0;
-                    connected.Add(new Pair(0, origin));
-                    do
-                    {
-                        int node = connected.Poll().index;
-                        Console.WriteLine(node);
-                        selected[node] = true;
-                        foreach (Edge e in adjacencylist[node])
-                        {
-                            int secnode = e.destination;
-                            if (!selected[secnode])
-                            {
-                                int newLength = length[node] + Mathf.RoundToInt(e.weight);
-                                if (newLength < length[secnode])
-                                {
-                                    bool nodeIsInQueue = length[secnode] < int.MaxValue;
-                                    length[secnode] = newLength;
-                                    path[node] = secnode;
-                                    if (nodeIsInQueue)
-                                    {
-                                        Pair p = new Pair(newLength, secnode);
-                                        connected.Remove(p);
-                                        connected.Add(p);
-                                    }
-                                    else
-                                    {
-                                        connected.Add(new Pair(newLength, secnode));
-                                    }
-                                }
-                            }
-                        }
-
-                    } while (!connected.IsEmpty());
-                    int current = origin;
-                    do
-                    {
-                        pathFound.AddLast(nodesarray[current]);
-                        Console.WriteLine(current);
-                        current = path[current];
-                    } while (current != dest);
-                    pathFound.AddLast(nodesarray[dest]);
-                    Console.WriteLine(current);
-                }
+                djikstra(hit);
             }
             
         }
+        
+        if (playerNavMeshAgent.remainingDistance > playerNavMeshAgent.stoppingDistance)
+        {
+
+            character.Move(playerNavMeshAgent.desiredVelocity, false, false);
+        }
+        else
+        {
+            if (pathFound.Count > 0)
+            {
+                playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
+                Debug.Log(pathFound.Last.Value.name);
+                pathFound.RemoveLast();
+            }
+            else
+            {
+                character.Move(Vector3.zero, false, false);
+            }
+           
+        }
+    }
+
+    public void djikstra(RaycastHit hit)
+    {
+        int dest = 0;
+
+        /*Collider[] objects = Physics.OverlapSphere(nodeInclusionSphere.transform.position, nodeInclusionSphere.radius, 10);
+
+        int origin = nodes[objects[0].gameObject];*/
+        int origin = 0;
+
+        float maxDistance = float.MaxValue;
+        float maxDistanceDest = float.MaxValue;
+        foreach (GameObject collider in nodes.Keys)
+        {
+            //Debug.Log("run : "+collider.name);
+            GameObject source = nodeInclusionSphere.gameObject;
+            GameObject destination = collider;
+            float x1 = source.transform.position.x;
+            float x2 = destination.transform.position.x;
+            float y1 = source.transform.position.y;
+            float y2 = destination.transform.position.y;
+            float z1 = source.transform.position.z;
+            float z2 = destination.transform.position.z;
+            float distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
+            if (distance <= maxDistance)
+            {
+                maxDistance = distance;
+                origin = nodes[collider.gameObject];
+            }
+            x1 = hit.point.x;
+            Debug.Log("x - "+ x1);
+            y1 = hit.point.y;
+            Debug.Log("y - " + y1);
+            z1 = hit.point.z;
+            Debug.Log("z - " + z1);
+            distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
+            if (distance <= maxDistanceDest)
+            {
+                maxDistanceDest = distance;
+                dest = nodes[collider.gameObject];
+            }
+        }
+
+        pathFound.Clear();
+
+        bool[] selected = new bool[vertices];
+        float[] length = new float[vertices];
+        path = new int[vertices];
+        //Debug.Log("origin : " + origin + " / destination : " + dest);
+        PriorityQueuePair connected = new PriorityQueuePair(vertices);
+        for (int v = 0; v < vertices; v++)
+        {
+            selected[v] = false;
+            length[v] = float.MaxValue;
+            path[v] = int.MinValue;
+        }
+        length[origin] = 0;
+        connected.Add(new Pair(0, origin));
+        do
+        {
+            int node = connected.Poll().index;
+            //Debug.Log("finding : "+node);
+            selected[node] = true;
+            foreach (Edge e in adjacencylist[node])
+            {
+                int secnode = e.destination;
+                if (!selected[secnode])
+                {
+                    float newLength = length[node] + e.weight;
+                    if (newLength < length[secnode])
+                    {
+                        bool nodeIsInQueue = length[secnode] < float.MaxValue;
+                        length[secnode] = newLength;
+                        path[secnode] = node;
+                        //Debug.Log(node+ " leads to " +secnode);
+                        //Debug.Log(nodeIsInQueue);
+
+                        if (nodeIsInQueue)
+                        {
+                            Pair p = new Pair(newLength, secnode);
+                            connected.Remove(p);
+                            connected.Add(p);
+                        }
+                        else
+                        {
+                            connected.Add(new Pair(newLength, secnode));
+                        }
+                        //PrintQueue(connected);
+                    }
+                }
+            }
+
+        } while (!connected.IsEmpty());
+        int current = dest;
+        //PrintArray(path);
+        do
+        {
+            
+            Debug.Log("found : " + current);
+            if (current < 0)
+            {
+                pathFound.Clear();
+                return;
+            }
+            pathFound.AddLast(nodesarray[current]);
+
+            current = path[current];
+            
+        } while (current != origin);
     }
 }
