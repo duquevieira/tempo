@@ -275,6 +275,8 @@ public class Pathfinding : MonoBehaviour
         return weight;
     }
 
+    
+
     void Start()
     {
         vertices = grid.transform.childCount;
@@ -404,30 +406,31 @@ public class Pathfinding : MonoBehaviour
             foreach (Edge e in adjacencylist[node])
             {
                 int secnode = e.destination;
-                if (!selected[secnode])
-                {
-                    float newLength = length[node] + e.weight;
-                    if (newLength < length[secnode])
+                if(nodesarray[secnode].activeSelf)
+                    if (!selected[secnode])
                     {
-                        bool nodeIsInQueue = length[secnode] < float.MaxValue;
-                        length[secnode] = newLength;
-                        path[secnode] = node;
-                        //Debug.Log(node+ " leads to " +secnode);
-                        //Debug.Log(nodeIsInQueue);
+                        float newLength = length[node] + e.weight;
+                        if (newLength < length[secnode])
+                        {
+                            bool nodeIsInQueue = length[secnode] < float.MaxValue;
+                            length[secnode] = newLength;
+                            path[secnode] = node;
+                            //Debug.Log(node+ " leads to " +secnode);
+                            //Debug.Log(nodeIsInQueue);
 
-                        if (nodeIsInQueue)
-                        {
-                            Pair p = new Pair(newLength, secnode);
-                            connected.Remove(p);
-                            connected.Add(p);
+                            if (nodeIsInQueue)
+                            {
+                                Pair p = new Pair(newLength, secnode);
+                                connected.Remove(p);
+                                connected.Add(p);
+                            }
+                            else
+                            {
+                                connected.Add(new Pair(newLength, secnode));
+                            }
+                            //PrintQueue(connected);
                         }
-                        else
-                        {
-                            connected.Add(new Pair(newLength, secnode));
-                        }
-                        //PrintQueue(connected);
                     }
-                }
             }
 
         } while (!connected.IsEmpty());
