@@ -370,11 +370,11 @@ public class Pathfinding : MonoBehaviour
                 origin = nodes[collider.gameObject];
             }
             x1 = hit.point.x;
-            Debug.Log("x - "+ x1);
+            //Debug.Log("x - "+ x1);
             y1 = hit.point.y;
-            Debug.Log("y - " + y1);
+            //Debug.Log("y - " + y1);
             z1 = hit.point.z;
-            Debug.Log("z - " + z1);
+            //Debug.Log("z - " + z1);
             distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
             if (distance <= maxDistanceDest)
             {
@@ -406,7 +406,7 @@ public class Pathfinding : MonoBehaviour
             foreach (Edge e in adjacencylist[node])
             {
                 int secnode = e.destination;
-                if(nodesarray[secnode].activeSelf)
+                if(nodesarray[secnode].transform.GetChild(0).gameObject.activeSelf)
                     if (!selected[secnode])
                     {
                         float newLength = length[node] + e.weight;
