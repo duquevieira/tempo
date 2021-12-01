@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
+using UnityEngine.UI;
+
 
 public class Pathfinding : MonoBehaviour
 {
@@ -20,8 +22,11 @@ public class Pathfinding : MonoBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private ThirdPersonCharacter character;
     [SerializeField] private SphereCollider nodeInclusionSphere;
+    [SerializeField] private Image tapImage;
+    [SerializeField] private Image walkingImage;
     private int[] path;
     public LinkedList<GameObject> pathFound;
+    private int tapCount;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -302,7 +307,29 @@ public class Pathfinding : MonoBehaviour
         pathFound = new LinkedList<GameObject>();
         PrintAdjacency(adjacencylist);
         playerNavMeshAgent.updateRotation = false;
+        SetWalkingImage(false);
+        SetTapImage(false);
 
+    }
+
+    private void SetWalkingImage(bool v)
+    {
+        var walkingColor = walkingImage.color;
+        walkingColor.a = v ? 1f : .3f;
+        walkingImage.color = walkingColor;
+    }
+
+    private void SetTapImage(bool v)
+    {
+        var tapColor = tapImage.color;
+        tapColor.a = v ? 1f : .3f;
+        tapImage.color = tapColor;
+    }
+
+    private void FixedUpdate()
+    {
+        if (tapCount<10)
+            tapCount++;
     }
 
     // Update is called once per frame
@@ -310,7 +337,7 @@ public class Pathfinding : MonoBehaviour
     {
         if (Input.GetButtonDown("Click"))
         {
-            
+            SetTapImage(true);
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
@@ -319,11 +346,17 @@ public class Pathfinding : MonoBehaviour
             }
             
         }
-        
+        if (tapCount == 10)
+        {
+            SetTapImage(false);
+            tapCount = 0;
+        }
+           
         if (playerNavMeshAgent.remainingDistance > playerNavMeshAgent.stoppingDistance)
         {
 
             character.Move(playerNavMeshAgent.desiredVelocity, false, false);
+            SetWalkingImage(true);
         }
         else
         {
@@ -332,10 +365,12 @@ public class Pathfinding : MonoBehaviour
                 playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
                 Debug.Log(pathFound.Last.Value.name);
                 pathFound.RemoveLast();
+                SetWalkingImage(true);
             }
             else
             {
                 character.Move(Vector3.zero, false, false);
+                SetWalkingImage(false);
             }
            
         }
