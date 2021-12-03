@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class Pathfinding : MonoBehaviour
 {
     // Start is called before the first frame update
+    const int FOOTCACHE = 6;
 
     [SerializeField] private GameObject grid;
     int vertices;
@@ -27,6 +28,11 @@ public class Pathfinding : MonoBehaviour
     private int[] path;
     public LinkedList<GameObject> pathFound;
     private int tapCount;
+    [SerializeField] private GameObject footStep;
+    [SerializeField] private GameObject clickFX;
+    private GameObject clickInstance;
+    private int footCount;
+    private GameObject[] footSteps;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -301,7 +307,9 @@ public class Pathfinding : MonoBehaviour
             GameObject[] connect = node.GetComponent<NodeConnections>().Connections;
             for (int j = 0; j<connect.Length; j++)
             {
+                Debug.Log(i+"-"+j);
                 AddEdge(i, nodes[connect[j]], calculateWeight(node, connect[j]));
+                
             }
         }
         pathFound = new LinkedList<GameObject>();
@@ -309,7 +317,8 @@ public class Pathfinding : MonoBehaviour
         playerNavMeshAgent.updateRotation = false;
         SetWalkingImage(false);
         SetTapImage(false);
-
+        footSteps = new GameObject[FOOTCACHE];
+        footCount = 0;
     }
 
     private void SetWalkingImage(bool v)
@@ -342,6 +351,9 @@ public class Pathfinding : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
+                if (clickInstance != null)
+                    Destroy(clickInstance);
+                clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
                 djikstra(hit);
             }
             
@@ -365,7 +377,13 @@ public class Pathfinding : MonoBehaviour
                 playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
                 Debug.Log(pathFound.Last.Value.name);
                 pathFound.RemoveLast();
+                if (footCount == footSteps.Length)
+                    footCount = 0;
+                if (footSteps[footCount] != null)
+                    Destroy(footSteps[footCount]);
+                footSteps[footCount++] = Instantiate(footStep,this.gameObject.transform.position, this.gameObject.transform.rotation,this.gameObject.transform);
                 SetWalkingImage(true);
+
             }
             else
             {

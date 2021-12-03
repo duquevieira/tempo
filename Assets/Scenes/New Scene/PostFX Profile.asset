@@ -40,6 +40,34 @@ MonoBehaviour:
   dirtIntensity:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-5127475639053746329
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 899c54efeace73346a0a16faa3afe726, type: 3}
+  m_Name: Vignette
+  m_EditorClassIdentifier: 
+  active: 1
+  color:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  center:
+    m_OverrideState: 0
+    m_Value: {x: 0.5, y: 0.5}
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.459
+  smoothness:
+    m_OverrideState: 1
+    m_Value: 0.323
+  rounded:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56,6 +84,7 @@ MonoBehaviour:
   - {fileID: 8772477299316665112}
   - {fileID: 6557361477625340359}
   - {fileID: -6001117911665761042}
+  - {fileID: -5127475639053746329}
 --- !u!114 &6557361477625340359
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -74,7 +103,7 @@ MonoBehaviour:
     m_Value: 0
   contrast:
     m_OverrideState: 1
-    m_Value: -37
+    m_Value: -36.2
   colorFilter:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -83,7 +112,7 @@ MonoBehaviour:
     m_Value: 0
   saturation:
     m_OverrideState: 1
-    m_Value: 50
+    m_Value: 100
 --- !u!114 &8772477299316665112
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -98,14 +127,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   shadows:
-    m_OverrideState: 0
-    m_Value: {x: 1, y: 0.8863507, z: 0.92013294, w: 0}
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 0.9298913, z: 0.7191342, w: -0.0000000017933106}
   midtones:
     m_OverrideState: 0
-    m_Value: {x: 1, y: 0.9992285, z: 0.9874497, w: 0.026905831}
+    m_Value: {x: 1, y: 0.9950995, z: 0.9807882, w: -0.0003699959}
   highlights:
     m_OverrideState: 0
-    m_Value: {x: 1, y: 0.7565232, z: 0.8988798, w: -0.008968608}
+    m_Value: {x: 1, y: 0.98836327, z: 0.9800477, w: 0.09331573}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0
