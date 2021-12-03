@@ -381,7 +381,7 @@ public class Pathfinding : MonoBehaviour
                     footCount = 0;
                 if (footSteps[footCount] != null)
                     Destroy(footSteps[footCount]);
-                footSteps[footCount++] = Instantiate(footStep,this.gameObject.transform.position, this.gameObject.transform.rotation,this.gameObject.transform);
+                footSteps[footCount++] = Instantiate(footStep,this.gameObject.transform.position, this.gameObject.transform.rotation,this.gameObject.transform.parent);
                 SetWalkingImage(true);
 
             }
