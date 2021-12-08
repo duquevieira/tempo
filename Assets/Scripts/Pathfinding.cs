@@ -33,6 +33,7 @@ public class Pathfinding : MonoBehaviour
     private GameObject clickInstance;
     private int footCount;
     private GameObject[] footSteps;
+    [SerializeField] TimelineControl[] timelineControllers;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -319,6 +320,10 @@ public class Pathfinding : MonoBehaviour
         SetTapImage(false);
         footSteps = new GameObject[FOOTCACHE];
         footCount = 0;
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.Pause();
+        }
     }
 
     private void SetWalkingImage(bool v)
@@ -355,8 +360,19 @@ public class Pathfinding : MonoBehaviour
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
                 djikstra(hit);
+                foreach(TimelineControl controller in timelineControllers)
+                {
+                    controller.Play();
+                }
             }
             
+        }
+        if (Input.GetButtonDown("Time"))
+        {
+            foreach (TimelineControl controller in timelineControllers)
+            {
+                controller.setRewind(!controller.isRewinding);
+            }
         }
         if (tapCount == 10)
         {
@@ -389,6 +405,10 @@ public class Pathfinding : MonoBehaviour
             {
                 character.Move(Vector3.zero, false, false);
                 SetWalkingImage(false);
+                foreach (TimelineControl controller in timelineControllers)
+                {
+                    controller.Pause();
+                }
             }
            
         }

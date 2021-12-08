@@ -33,7 +33,6 @@ public class AudioControl : MonoBehaviour
     {
         mixer.SetFloat("ForwardMusicVolume", -80f);
         mixer.SetFloat("BackwardMusicVolume", 0f);
-        reverseEffectSound.Play();
         defaultAudioMix.TransitionTo(transitionTime);
     }
 
@@ -42,6 +41,11 @@ public class AudioControl : MonoBehaviour
         mixer.SetFloat("ForwardMusicVolume", 0f);
         mixer.SetFloat("BackwardMusicVolume", -80f);
         freezeSnapshot.TransitionTo(transitionTime);
+    }
+
+    public void AudioToggle()
+    {
+        reverseEffectSound.Play();
     }
 
     // Update is called once per frame

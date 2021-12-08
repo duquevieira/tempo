@@ -22,15 +22,84 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Volume rewindVolume;
     [SerializeField] private Volume normalVolume;
     [SerializeField] private float transitionDuration;
-    private bool isPlaying;
     [SerializeField] private AudioControl audioController;
+    private bool isPaused = false;
+    public bool isRewinding = false;
 
 
     // Start is called before the first frame update
+    public void Pause()
+    {
+        isPaused = true;
+        playableDirector.Pause();
+        SetImage(false, playImage);
+        SetImage(true, pauseImage);
+        SetImage(false, rewindImage);
+        DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(pauseVolume.weight, 1, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        audioController.AudioStop();
+    }
+
+    public void Play()
+    {
+        isPaused = false;
+        if (!isRewinding)
+        {
+            playableDirector.Resume();
+            SetImage(true, playImage);
+            SetImage(false, pauseImage);
+            SetImage(false, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioForward();
+        }
+        else
+        {
+            playableDirector.Resume();
+            SetImage(false, playImage);
+            SetImage(false, pauseImage);
+            SetImage(true, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioReverse();
+
+        }
+    }
+
+    public void setRewind(bool value)
+    {
+        isRewinding = value;
+        if (!isRewinding)
+        {
+            playableDirector.Resume();
+            SetImage(true, playImage);
+            SetImage(false, pauseImage);
+            SetImage(false, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioForward();
+        }
+        else
+        {
+            playableDirector.Resume();
+            SetImage(false, playImage);
+            SetImage(false, pauseImage);
+            SetImage(true, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioReverse();
+            audioController.AudioToggle();
+        }
+    }
+
     void Start()
     {
         playableDirector.time = 0;
-        isPlaying = false;
         SetImage(true, playImage);
         SetImage(false, pauseImage);
         SetImage(false, rewindImage);
@@ -56,48 +125,26 @@ public class TimelineControl : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (Input.GetButtonDown("Time"))
+        if (!isPaused)
         {
-            playableDirector.Resume();
-            isPlaying = true;
-            SetImage(true,playImage);
-            SetImage(false, pauseImage);
-            SetImage(false, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 1, transitionDuration,normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioForward();
-        }
-        if (Input.GetButtonDown("Rewind"))
-        {
-            playableDirector.Resume();
-            isPlaying = true;
-            SetImage(false, playImage);
-            SetImage(false, pauseImage);
-            SetImage(true, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioReverse();
+            if (!isRewinding)
+            {
+                playableDirector.Resume();
+                SetImage(true, playImage);
+                SetImage(false, pauseImage);
+                SetImage(false, rewindImage);
+                DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+                DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+                DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+                audioController.AudioForward();
+            }
+            else
+            {
+                double timeDifference = Time.deltaTime;
+                if (playableDirector.time > timeDifference)
+                    playableDirector.time -= timeDifference;
 
-        }
-        double timeDifference = Time.deltaTime;
-        if (Input.GetButton("Rewind"))
-        {
-            if(playableDirector.time > timeDifference)
-                playableDirector.time -= timeDifference;
-        }
-        if (Input.GetButtonUp("Rewind"))
-        {
-            playableDirector.Pause();
-            isPlaying = false;
-            SetImage(false, playImage);
-            SetImage(true, pauseImage);
-            SetImage(false, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 1, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioStop();
+            }
         }
     }
 
@@ -108,10 +155,4 @@ public class TimelineControl : MonoBehaviour
         img.color = Color;
     }
 
-    public void Play()
-    {
-        playableDirector.Play();
-        if (!isPlaying)
-            playableDirector.Pause();
-    }
 }
