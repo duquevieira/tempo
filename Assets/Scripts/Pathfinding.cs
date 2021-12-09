@@ -21,7 +21,6 @@ public class Pathfinding : MonoBehaviour
     [SerializeField] private float horizontalModifier;
     [SerializeField] private NavMeshAgent playerNavMeshAgent;
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private ThirdPersonCharacter character;
     [SerializeField] private SphereCollider nodeInclusionSphere;
     [SerializeField] private Image tapImage;
     [SerializeField] private Image walkingImage;
@@ -34,6 +33,7 @@ public class Pathfinding : MonoBehaviour
     private int footCount;
     private GameObject[] footSteps;
     [SerializeField] TimelineControl[] timelineControllers;
+    private bool clickToggle;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -287,7 +287,14 @@ public class Pathfinding : MonoBehaviour
         return weight;
     }
 
-    
+    void OnTriggerEnter(Collider col)
+    {
+        if(col.gameObject.layer != grid.layer)
+        {
+            playerNavMeshAgent.ResetPath();
+            pathFound.Clear();
+        }
+    }
 
     void Start()
     {
@@ -344,12 +351,7 @@ public class Pathfinding : MonoBehaviour
     {
         if (tapCount<10)
             tapCount++;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetButtonDown("Click"))
+        if (clickToggle)
         {
             SetTapImage(true);
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
@@ -360,13 +362,27 @@ public class Pathfinding : MonoBehaviour
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
                 djikstra(hit);
-                foreach(TimelineControl controller in timelineControllers)
+                foreach (TimelineControl controller in timelineControllers)
                 {
                     controller.Play();
                 }
             }
-            
+
         }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetButtonDown("Click"))
+        {
+            clickToggle = true;
+        }
+        if (Input.GetButtonUp("Click"))
+        {
+            clickToggle = false;
+        }
+
         if (Input.GetButtonDown("Time"))
         {
             foreach (TimelineControl controller in timelineControllers)
@@ -382,9 +398,7 @@ public class Pathfinding : MonoBehaviour
            
         if (playerNavMeshAgent.remainingDistance > playerNavMeshAgent.stoppingDistance)
         {
-
-            character.Move(playerNavMeshAgent.desiredVelocity, false, false);
-            SetWalkingImage(true);
+            
         }
         else
         {
@@ -403,12 +417,12 @@ public class Pathfinding : MonoBehaviour
             }
             else
             {
-                character.Move(Vector3.zero, false, false);
-                SetWalkingImage(false);
+                pathFound.Clear();
                 foreach (TimelineControl controller in timelineControllers)
                 {
                     controller.Pause();
                 }
+                playerNavMeshAgent.ResetPath();
             }
            
         }
@@ -427,33 +441,37 @@ public class Pathfinding : MonoBehaviour
         float maxDistanceDest = float.MaxValue;
         foreach (GameObject collider in nodes.Keys)
         {
-            //Debug.Log("run : "+collider.name);
-            GameObject source = nodeInclusionSphere.gameObject;
-            GameObject destination = collider;
-            float x1 = source.transform.position.x;
-            float x2 = destination.transform.position.x;
-            float y1 = source.transform.position.y;
-            float y2 = destination.transform.position.y;
-            float z1 = source.transform.position.z;
-            float z2 = destination.transform.position.z;
-            float distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
-            if (distance <= maxDistance)
+            if (collider.transform.GetChild(0).gameObject.activeSelf)
             {
-                maxDistance = distance;
-                origin = nodes[collider.gameObject];
+                //Debug.Log("run : "+collider.name);
+                GameObject source = nodeInclusionSphere.gameObject;
+                GameObject destination = collider;
+                float x1 = source.transform.position.x;
+                float x2 = destination.transform.position.x;
+                float y1 = source.transform.position.y;
+                float y2 = destination.transform.position.y;
+                float z1 = source.transform.position.z;
+                float z2 = destination.transform.position.z;
+                float distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
+                if (distance <= maxDistance)
+                {
+                    maxDistance = distance;
+                    origin = nodes[collider.gameObject];
+                }
+                x1 = hit.point.x;
+                //Debug.Log("x - "+ x1);
+                y1 = hit.point.y;
+                //Debug.Log("y - " + y1);
+                z1 = hit.point.z;
+                //Debug.Log("z - " + z1);
+                distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
+                if (distance <= maxDistanceDest)
+                {
+                    maxDistanceDest = distance;
+                    dest = nodes[collider.gameObject];
+                }
             }
-            x1 = hit.point.x;
-            //Debug.Log("x - "+ x1);
-            y1 = hit.point.y;
-            //Debug.Log("y - " + y1);
-            z1 = hit.point.z;
-            //Debug.Log("z - " + z1);
-            distance = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
-            if (distance <= maxDistanceDest)
-            {
-                maxDistanceDest = distance;
-                dest = nodes[collider.gameObject];
-            }
+            
         }
 
         pathFound.Clear();
