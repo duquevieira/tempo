@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
 using UnityEngine.UI;
+using UnityEditorInternal;
 
 
 public class Pathfinding : MonoBehaviour
@@ -17,8 +18,8 @@ public class Pathfinding : MonoBehaviour
     private LinkedList<Edge>[] adjacencylist;
     private Dictionary<GameObject,int> nodes;
     private GameObject[] nodesarray;
-    [SerializeField] private float verticalModifier;
-    [SerializeField] private float horizontalModifier;
+    [SerializeField] private float verticalModifier=1;
+    [SerializeField] private float horizontalModifier=1;
     [SerializeField] private NavMeshAgent playerNavMeshAgent;
     [SerializeField] private Camera playerCamera;
     [SerializeField] private SphereCollider nodeInclusionSphere;
@@ -26,14 +27,14 @@ public class Pathfinding : MonoBehaviour
     [SerializeField] private Image walkingImage;
     private int[] path;
     public LinkedList<GameObject> pathFound;
-    private int tapCount;
     [SerializeField] private GameObject footStep;
     [SerializeField] private GameObject clickFX;
     private GameObject clickInstance;
     private int footCount;
     private GameObject[] footSteps;
     [SerializeField] TimelineControl[] timelineControllers;
-    private bool clickToggle;
+    private bool isMoving;
+    public LayerMask mask;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -289,10 +290,19 @@ public class Pathfinding : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.layer != grid.layer)
+        if (mask == (mask | (1 << col.gameObject.layer)))
         {
-            playerNavMeshAgent.ResetPath();
+            playerNavMeshAgent.ActivateCurrentOffMeshLink(false);
             pathFound.Clear();
+        }
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (mask == (mask | (1 << col.gameObject.layer)))
+        {
+            playerNavMeshAgent.ActivateCurrentOffMeshLink(true);
+            playerNavMeshAgent.SetDestination(gameObject.transform.position);
         }
     }
 
@@ -315,13 +325,13 @@ public class Pathfinding : MonoBehaviour
             GameObject[] connect = node.GetComponent<NodeConnections>().Connections;
             for (int j = 0; j<connect.Length; j++)
             {
-                Debug.Log(i+"-"+j);
+                //Debug.Log(i+"-"+j);
                 AddEdge(i, nodes[connect[j]], calculateWeight(node, connect[j]));
                 
             }
         }
         pathFound = new LinkedList<GameObject>();
-        PrintAdjacency(adjacencylist);
+        //PrintAdjacency(adjacencylist);
         playerNavMeshAgent.updateRotation = false;
         SetWalkingImage(false);
         SetTapImage(false);
@@ -329,8 +339,9 @@ public class Pathfinding : MonoBehaviour
         footCount = 0;
         foreach (TimelineControl controller in timelineControllers)
         {
-            controller.Pause();
+            controller.Play();
         }
+        isMoving = false;
     }
 
     private void SetWalkingImage(bool v)
@@ -347,11 +358,11 @@ public class Pathfinding : MonoBehaviour
         tapImage.color = tapColor;
     }
 
-    private void FixedUpdate()
+
+    // Update is called once per frame
+    void Update()
     {
-        if (tapCount<10)
-            tapCount++;
-        if (clickToggle)
+        if (Input.GetButton("Click"))
         {
             SetTapImage(true);
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
@@ -366,66 +377,52 @@ public class Pathfinding : MonoBehaviour
                 {
                     controller.Play();
                 }
+                Debug.Log(pathFound.Count);
             }
 
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetButtonDown("Click"))
-        {
-            clickToggle = true;
-        }
         if (Input.GetButtonUp("Click"))
         {
-            clickToggle = false;
+            SetTapImage(false);
         }
 
         if (Input.GetButtonDown("Time"))
         {
             foreach (TimelineControl controller in timelineControllers)
             {
-                controller.setRewind(!controller.isRewinding);
+                controller.setRewind(true);
             }
+            pathFound.Clear();
+            SetWalkingImage(false);
         }
-        if (tapCount == 10)
-        {
-            SetTapImage(false);
-            tapCount = 0;
-        }
-           
-        if (playerNavMeshAgent.remainingDistance > playerNavMeshAgent.stoppingDistance)
-        {
-            
-        }
-        else
+        if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
         {
             if (pathFound.Count > 0)
             {
+                //Debug.Log("count:"+pathFound.Count);
+                //Debug.Log(playerNavMeshAgent.remainingDistance);
+                //Debug.Log(playerNavMeshAgent.stoppingDistance);
                 playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
-                Debug.Log(pathFound.Last.Value.name);
+                //Debug.Log(pathFound.Last.Value.name);
                 pathFound.RemoveLast();
                 if (footCount == footSteps.Length)
                     footCount = 0;
                 if (footSteps[footCount] != null)
                     Destroy(footSteps[footCount]);
-                footSteps[footCount++] = Instantiate(footStep,this.gameObject.transform.position, this.gameObject.transform.rotation,this.gameObject.transform.parent);
+                footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
                 SetWalkingImage(true);
-
+                //Debug.Log("count2:" + pathFound.Count);
+                isMoving =true;
             }
             else
             {
-                pathFound.Clear();
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Pause();
-                }
-                playerNavMeshAgent.ResetPath();
+                SetWalkingImage(false);
+                isMoving = false;
             }
-           
+
         }
+
+
     }
 
     public void djikstra(RaycastHit hit)

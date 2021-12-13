@@ -8,7 +8,7 @@ using TMPro;
 using DG.Tweening;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-
+using System;
 
 public class TimelineControl : MonoBehaviour
 {
@@ -44,29 +44,15 @@ public class TimelineControl : MonoBehaviour
     public void Play()
     {
         isPaused = false;
-        if (!isRewinding)
-        {
-            playableDirector.Resume();
-            SetImage(true, playImage);
-            SetImage(false, pauseImage);
-            SetImage(false, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioForward();
-        }
-        else
-        {
-            playableDirector.Resume();
-            SetImage(false, playImage);
-            SetImage(false, pauseImage);
-            SetImage(true, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioReverse();
-
-        }
+        isRewinding = false;
+        playableDirector.Resume();
+        SetImage(false, playImage);
+        SetImage(false, pauseImage);
+        SetImage(true, rewindImage);
+        DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        audioController.AudioReverse();
     }
 
     public void setRewind(bool value)
@@ -125,6 +111,13 @@ public class TimelineControl : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if(isRewinding)
+        {
+            double timeDifference = Time.deltaTime;
+            if (playableDirector.time > timeDifference)
+                playableDirector.time -= timeDifference;
+
+        }
         if (!isPaused)
         {
             if (!isRewinding)
@@ -138,13 +131,6 @@ public class TimelineControl : MonoBehaviour
                 DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
                 audioController.AudioForward();
             }
-            else
-            {
-                double timeDifference = Time.deltaTime;
-                if (playableDirector.time > timeDifference)
-                    playableDirector.time -= timeDifference;
-
-            }
         }
     }
 
@@ -155,4 +141,11 @@ public class TimelineControl : MonoBehaviour
         img.color = Color;
     }
 
+    internal void Resume()
+    {
+        if (isPaused)
+        {
+            Pause();
+        }
+    }
 }

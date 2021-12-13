@@ -5042,16 +5042,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
-  verticalModifier: 0
-  horizontalModifier: 0
-  playerNavMeshAgent: {fileID: 0}
+  verticalModifier: 1
+  horizontalModifier: 1
+  playerNavMeshAgent: {fileID: 4010643369812260178}
   playerCamera: {fileID: 0}
-  character: {fileID: 0}
-  nodeInclusionSphere: {fileID: 0}
+  nodeInclusionSphere: {fileID: -796363701859867410}
   tapImage: {fileID: 0}
   walkingImage: {fileID: 0}
-  footStep: {fileID: 0}
-  clickFX: {fileID: 0}
+  footStep: {fileID: 1878560746460868, guid: 2397083e876e5b1408fcc1333f50c082, type: 3}
+  clickFX: {fileID: 1450638143650814, guid: 9fe1ddc0da27cb44ebeeb8c2befa68bd, type: 3}
   timelineControllers: []
 --- !u!135 &-796363701859867410
 SphereCollider:
