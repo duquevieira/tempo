@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System;
 
-public class TimelineControl : MonoBehaviour
+public class TimelineControlAlt : MonoBehaviour
 {
     [SerializeField] private PlayableDirector playableDirector = null;
     [SerializeField] private Image playImage;
@@ -23,6 +23,8 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Volume normalVolume;
     [SerializeField] private float transitionDuration;
     [SerializeField] private AudioControl audioController;
+    [SerializeField] private GameObject[] dynamicObjects;
+    private Vector3[,] positions;
     private bool isPaused = false;
     public bool isRewinding = false;
 
@@ -91,7 +93,8 @@ public class TimelineControl : MonoBehaviour
         SetImage(false, rewindImage);
         rewindText.text = "L Shift";
         playText.text = "Space";
-        Debug.Log(playableDirector.duration);
+        int j = Mathf.FloorToInt((float)(playableDirector.duration / 0.033)) + 1;
+        positions = new Vector3[dynamicObjects.Length,j];
     }
 
     void normalVolumeWeight(float weight)
@@ -117,7 +120,22 @@ public class TimelineControl : MonoBehaviour
             double timeDifference = Time.deltaTime;
             if (playableDirector.time > timeDifference)
                 playableDirector.time -= timeDifference;
-
+            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / 0.033));
+            for (int i = 0; i < positions.GetLength(0); i++)
+            {
+                if (positions[i, timeIndex]!=Vector3.zero)
+                    dynamicObjects[i].gameObject.transform.position =  positions[i, timeIndex];
+                positions[i, timeIndex+1] = Vector3.zero;
+                positions[i, timeIndex] = Vector3.zero;
+            }
+        }
+        else
+        {
+            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / 0.033));
+            for (int i = 0; i < positions.GetLength(0); i++)
+            {
+                positions[i,timeIndex] = dynamicObjects[i].gameObject.transform.position;
+            }
         }
         if (!isPaused)
         {

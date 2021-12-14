@@ -3603,6 +3603,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 720475551}
     - target: {fileID: 3496299991837806255, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3496299991837806255, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
       propertyPath: mask.m_Bits
       value: 0
       objectReference: {fileID: 0}
@@ -8768,6 +8772,48 @@ Transform:
   m_Father: {fileID: 1585012161}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1971847072 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4012622509079822852, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+  m_PrefabInstance: {fileID: 948948549}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &1971847073 stripped
+SphereCollider:
+  m_CorrespondingSourceObject: {fileID: -796363701859867410, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+  m_PrefabInstance: {fileID: 948948549}
+  m_PrefabAsset: {fileID: 0}
+--- !u!195 &1971847075 stripped
+NavMeshAgent:
+  m_CorrespondingSourceObject: {fileID: 4010643369812260178, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+  m_PrefabInstance: {fileID: 948948549}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1971847080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971847072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2634805b7c3032439ef83a0324dc562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 449859098}
+  verticalModifier: 1
+  horizontalModifier: 1
+  playerNavMeshAgent: {fileID: 1971847075}
+  playerCamera: {fileID: 770954518}
+  nodeInclusionSphere: {fileID: 1971847073}
+  tapImage: {fileID: 720475551}
+  walkingImage: {fileID: 720475550}
+  footStep: {fileID: 1878560746460868, guid: 2397083e876e5b1408fcc1333f50c082, type: 3}
+  clickFX: {fileID: 1450638143650814, guid: 9fe1ddc0da27cb44ebeeb8c2befa68bd, type: 3}
+  timelineControllers:
+  - {fileID: 2077039952}
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &2000920022
 GameObject:
   m_ObjectHideFlags: 0
@@ -9163,6 +9209,7 @@ GameObject:
   - component: {fileID: 2077039950}
   - component: {fileID: 2077039949}
   - component: {fileID: 2077039951}
+  - component: {fileID: 2077039952}
   m_Layer: 0
   m_Name: Timeline
   m_TagString: Untagged
@@ -9192,7 +9239,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2077039947}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 845b127c33dc8d349adb94981026a3c1, type: 3}
   m_Name: 
@@ -9253,6 +9300,32 @@ MonoBehaviour:
   freezeSnapshot: {fileID: 24500006, guid: c7e65f82ebe3a194c90aabdb049bcb20, type: 2}
   transitionTime: 0.05
   mixer: {fileID: 24100000, guid: c7e65f82ebe3a194c90aabdb049bcb20, type: 2}
+--- !u!114 &2077039952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077039947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d7d2645ef07fc2479b30cd41b273d8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playableDirector: {fileID: 2077039950}
+  playImage: {fileID: 645025410}
+  rewindImage: {fileID: 1003222548}
+  pauseImage: {fileID: 1712857857}
+  rewindText: {fileID: 30472459}
+  playText: {fileID: 838700669}
+  pauseVolume: {fileID: 1838814300}
+  rewindVolume: {fileID: 1838814302}
+  normalVolume: {fileID: 1838814301}
+  transitionDuration: 0.05
+  audioController: {fileID: 2077039951}
+  dynamicObjects:
+  - {fileID: 1971847072}
+  isRewinding: 0
 --- !u!1001 &2091020725
 PrefabInstance:
   m_ObjectHideFlags: 0
