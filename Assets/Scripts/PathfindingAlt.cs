@@ -368,11 +368,20 @@ public class PathfindingAlt : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                djikstra(hit);
+                bool willPlay = true;
                 foreach (TimelineControlAlt controller in timelineControllers)
                 {
-                    controller.Play();
+                    if (controller.HasEnded())
+                    {
+                        willPlay = false&willPlay;
+                    }
+                    else
+                    {
+                        controller.Play();
+                    }
                 }
+                if(willPlay)
+                    djikstra(hit);
                 if (clickInstance != null)
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);

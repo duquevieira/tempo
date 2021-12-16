@@ -27,7 +27,7 @@ public class TimelineControlAlt : MonoBehaviour
     private Vector3[,] positions;
     private bool isPaused = false;
     public bool isRewinding = false;
-
+    private const double TIMEFACTOR = 0.07;
 
     // Start is called before the first frame update
     public void Pause()
@@ -93,7 +93,7 @@ public class TimelineControlAlt : MonoBehaviour
         SetImage(false, rewindImage);
         rewindText.text = "L Shift";
         playText.text = "Space";
-        int j = Mathf.FloorToInt((float)(playableDirector.duration / 0.033)) + 1;
+        int j = Mathf.FloorToInt((float)(playableDirector.duration / TIMEFACTOR)) + 1;
         positions = new Vector3[dynamicObjects.Length,j];
     }
 
@@ -120,21 +120,28 @@ public class TimelineControlAlt : MonoBehaviour
             double timeDifference = Time.deltaTime;
             if (playableDirector.time > timeDifference)
                 playableDirector.time -= timeDifference;
-            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / 0.033));
+            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
             for (int i = 0; i < positions.GetLength(0); i++)
             {
                 if (positions[i, timeIndex]!=Vector3.zero)
-                    dynamicObjects[i].gameObject.transform.position =  positions[i, timeIndex];
-                positions[i, timeIndex+1] = Vector3.zero;
+                    dynamicObjects[i].gameObject.transform.DOMove(positions[i, timeIndex], (float)TIMEFACTOR);
                 positions[i, timeIndex] = Vector3.zero;
+            }
+            if (playableDirector.time < timeDifference)
+            {
+                Pause();
             }
         }
         else
         {
-            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / 0.033));
+            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
             for (int i = 0; i < positions.GetLength(0); i++)
             {
                 positions[i,timeIndex] = dynamicObjects[i].gameObject.transform.position;
+            }
+            if (HasEnded())
+            {
+                Pause();
             }
         }
         if (!isPaused)
@@ -166,5 +173,10 @@ public class TimelineControlAlt : MonoBehaviour
         {
             Pause();
         }
+    }
+
+    public bool HasEnded()
+    {
+        return playableDirector.duration == playableDirector.time;
     }
 }
