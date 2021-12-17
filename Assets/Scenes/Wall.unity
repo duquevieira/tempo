@@ -2354,6 +2354,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23692657072916502, guid: abdd014ec4473fb4f8c8584b6cef940e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e8fb578efa3dafa41beb2cad2b46dce8, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: abdd014ec4473fb4f8c8584b6cef940e, type: 3}
 --- !u!1001 &711910685
@@ -2888,6 +2892,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23907988670507110, guid: b134f3b15eaeff041bc28faf7b5dc10c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e8fb578efa3dafa41beb2cad2b46dce8, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b134f3b15eaeff041bc28faf7b5dc10c, type: 3}
 --- !u!4 &811890404 stripped
@@ -3514,6 +3522,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23968345647745374, guid: 3afc18436889b854ab9a548ee3e323c8, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e8fb578efa3dafa41beb2cad2b46dce8, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3afc18436889b854ab9a548ee3e323c8, type: 3}
 --- !u!4 &921663014 stripped
@@ -7883,6 +7895,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23907988670507110, guid: b134f3b15eaeff041bc28faf7b5dc10c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e8fb578efa3dafa41beb2cad2b46dce8, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b134f3b15eaeff041bc28faf7b5dc10c, type: 3}
 --- !u!1001 &1816026763
@@ -9326,6 +9342,7 @@ MonoBehaviour:
   dynamicObjects:
   - {fileID: 1971847072}
   isRewinding: 0
+  standard: {fileID: 2100000, guid: e8fb578efa3dafa41beb2cad2b46dce8, type: 2}
 --- !u!1001 &2091020725
 PrefabInstance:
   m_ObjectHideFlags: 0

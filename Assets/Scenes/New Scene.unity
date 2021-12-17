@@ -15426,7 +15426,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1091078321722050, guid: 947f5ae0cb6cd9944ba9a66c0667d6be, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4712499165282552, guid: 947f5ae0cb6cd9944ba9a66c0667d6be, type: 3}
       propertyPath: m_RootOrder
@@ -24029,7 +24029,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 567
+    m_Bits: 2147483647
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

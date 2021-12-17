@@ -29,6 +29,8 @@ public class TimelineControlAlt : MonoBehaviour
     public bool isRewinding = false;
     private const double TIMEFACTOR = 0.07;
 
+    [SerializeField] private Material standard;
+
     // Start is called before the first frame update
     public void Pause()
     {
@@ -55,6 +57,8 @@ public class TimelineControlAlt : MonoBehaviour
         DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioReverse();
+        
+        
     }
 
     public void setRewind(bool value)
@@ -115,33 +119,39 @@ public class TimelineControlAlt : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if(isRewinding)
+        if (!isPaused)
         {
             double timeDifference = Time.deltaTime;
-            if (playableDirector.time > timeDifference)
-                playableDirector.time -= timeDifference;
-            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
-            for (int i = 0; i < positions.GetLength(0); i++)
+            if (isRewinding)
             {
-                if (positions[i, timeIndex]!=Vector3.zero)
-                    dynamicObjects[i].gameObject.transform.DOMove(positions[i, timeIndex], (float)TIMEFACTOR);
-                positions[i, timeIndex] = Vector3.zero;
+
+                if (playableDirector.time > timeDifference)
+                    playableDirector.time -= timeDifference;
+                int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
+                for (int i = 0; i < positions.GetLength(0); i++)
+                {
+                    if (positions[i, timeIndex] != Vector3.zero)
+                        dynamicObjects[i].gameObject.transform.DOMove(positions[i, timeIndex], (float)TIMEFACTOR);
+                    positions[i, timeIndex] = Vector3.zero;
+                }
+                if (playableDirector.time < timeDifference)
+                {
+                    Pause();
+                }
+                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
             }
-            if (playableDirector.time < timeDifference)
+            else
             {
-                Pause();
-            }
-        }
-        else
-        {
-            int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
-            for (int i = 0; i < positions.GetLength(0); i++)
-            {
-                positions[i,timeIndex] = dynamicObjects[i].gameObject.transform.position;
-            }
-            if (HasEnded())
-            {
-                Pause();
+                int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
+                for (int i = 0; i < positions.GetLength(0); i++)
+                {
+                    positions[i, timeIndex] = dynamicObjects[i].gameObject.transform.position;
+                }
+                if (HasEnded())
+                {
+                    Pause();
+                }
+                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
             }
         }
         if (!isPaused)
@@ -177,6 +187,6 @@ public class TimelineControlAlt : MonoBehaviour
 
     public bool HasEnded()
     {
-        return playableDirector.duration == playableDirector.time;
+        return playableDirector.duration == playableDirector.time||(isRewinding&!isPaused);
     }
 }
