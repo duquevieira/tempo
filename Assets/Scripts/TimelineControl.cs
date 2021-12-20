@@ -23,8 +23,13 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Volume normalVolume;
     [SerializeField] private float transitionDuration;
     [SerializeField] private AudioControl audioController;
+    [SerializeField] private GameObject[] dynamicObjects;
+    private Vector3[,] positions;
+    private Quaternion[,] rotations;
     private bool isPaused = false;
     public bool isRewinding = false;
+    private const double TIMEFACTOR = 0.1;
+    [SerializeField] private Material standard;
 
 
     // Start is called before the first frame update
@@ -91,7 +96,9 @@ public class TimelineControl : MonoBehaviour
         SetImage(false, rewindImage);
         rewindText.text = "L Shift";
         playText.text = "Space";
-        Debug.Log(playableDirector.duration);
+        int j = Mathf.FloorToInt((float)(playableDirector.duration / TIMEFACTOR)) + 1;
+        positions = new Vector3[dynamicObjects.Length, j];
+        rotations = new Quaternion[dynamicObjects.Length, j];
     }
 
     void normalVolumeWeight(float weight)
@@ -112,25 +119,40 @@ public class TimelineControl : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if(isRewinding)
-        {
-            double timeDifference = Time.deltaTime;
-            if (playableDirector.time > timeDifference)
-                playableDirector.time -= timeDifference;
-
-        }
         if (!isPaused)
         {
-            if (!isRewinding)
+            double timeDifference = Time.deltaTime;
+            if (isRewinding)
             {
-                playableDirector.Resume();
-                SetImage(true, playImage);
-                SetImage(false, pauseImage);
-                SetImage(false, rewindImage);
-                DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-                DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-                DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-                audioController.AudioForward();
+
+                if (playableDirector.time > timeDifference)
+                    playableDirector.time -= timeDifference;
+                int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
+                for (int i = 0; i < positions.GetLength(0); i++)
+                {
+                    if (positions[i, timeIndex] != Vector3.zero)
+                    {
+                        dynamicObjects[i].gameObject.transform.DOMove(positions[i, timeIndex], (float)TIMEFACTOR);
+                        dynamicObjects[i].gameObject.transform.DORotateQuaternion(rotations[i, timeIndex], (float)TIMEFACTOR);
+                    }
+                    positions[i, timeIndex] = Vector3.zero;
+                    rotations[i, timeIndex] = Quaternion.identity;
+                }
+                if (playableDirector.time < timeDifference)
+                {
+                    Pause();
+                }
+                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
+            }
+            else
+            {
+                int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
+                for (int i = 0; i < positions.GetLength(0); i++)
+                {
+                    positions[i, timeIndex] = dynamicObjects[i].gameObject.transform.position;
+                    rotations[i, timeIndex] = dynamicObjects[i].gameObject.transform.rotation;
+                }
+                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
             }
         }
     }
@@ -148,5 +170,9 @@ public class TimelineControl : MonoBehaviour
         {
             Pause();
         }
+    }
+    public bool HasEnded()
+    {
+        return playableDirector.duration == playableDirector.time || (isRewinding & !isPaused);
     }
 }

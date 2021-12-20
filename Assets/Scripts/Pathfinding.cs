@@ -386,7 +386,7 @@ public class Pathfinding : MonoBehaviour
             SetTapImage(false);
         }
 
-        if (Input.GetButtonDown("Time"))
+        if (Input.GetButtonDown("Rewind"))
         {
             foreach (TimelineControl controller in timelineControllers)
             {
