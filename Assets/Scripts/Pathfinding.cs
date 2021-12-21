@@ -388,6 +388,7 @@ public class Pathfinding : MonoBehaviour
 
         if (Input.GetButtonDown("Rewind"))
         {
+            Debug.Log("rewind");
             foreach (TimelineControl controller in timelineControllers)
             {
                 controller.setRewind(true);
