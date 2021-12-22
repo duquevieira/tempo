@@ -33,7 +33,7 @@ public class Pathfinding : MonoBehaviour
     private int footCount;
     private GameObject[] footSteps;
     [SerializeField] TimelineControl[] timelineControllers;
-    private bool isMoving;
+    //private bool isMoving;
     public LayerMask mask;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
@@ -341,7 +341,7 @@ public class Pathfinding : MonoBehaviour
         {
             controller.Play();
         }
-        isMoving = false;
+        //isMoving = false;
     }
 
     private void SetWalkingImage(bool v)
@@ -388,7 +388,6 @@ public class Pathfinding : MonoBehaviour
 
         if (Input.GetButtonDown("Rewind"))
         {
-            Debug.Log("rewind");
             foreach (TimelineControl controller in timelineControllers)
             {
                 controller.setRewind(true);
@@ -396,6 +395,15 @@ public class Pathfinding : MonoBehaviour
             pathFound.Clear();
             SetWalkingImage(false);
         }
+        if (Input.GetButtonUp("Rewind"))
+        {
+            foreach (TimelineControl controller in timelineControllers)
+            {
+                controller.Play();
+            }
+        }
+
+
         if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
         {
             if (pathFound.Count > 0)
@@ -413,12 +421,12 @@ public class Pathfinding : MonoBehaviour
                 footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
                 SetWalkingImage(true);
                 //Debug.Log("count2:" + pathFound.Count);
-                isMoving =true;
+                //isMoving =true;
             }
             else
             {
                 SetWalkingImage(false);
-                isMoving = false;
+                //isMoving = false;
             }
 
         }

@@ -33,7 +33,7 @@ public class PathfindingAlt : MonoBehaviour
     private int footCount;
     private GameObject[] footSteps;
     [SerializeField] TimelineControlAlt[] timelineControllers;
-    private bool isMoving;
+    //private bool isMoving;
     public LayerMask mask;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
@@ -341,7 +341,7 @@ public class PathfindingAlt : MonoBehaviour
         {
             controller.Play();
         }
-        isMoving = false;
+        //isMoving = false;
     }
 
     private void SetWalkingImage(bool v)
@@ -423,12 +423,12 @@ public class PathfindingAlt : MonoBehaviour
                 footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
                 SetWalkingImage(true);
                 //Debug.Log("count2:" + pathFound.Count);
-                isMoving =true;
+                //isMoving =true;
             }
             else
             {
                 SetWalkingImage(false);
-                isMoving = false;
+                //isMoving = false;
             }
 
         }

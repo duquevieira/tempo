@@ -51,13 +51,13 @@ public class TimelineControl : MonoBehaviour
         isPaused = false;
         isRewinding = false;
         playableDirector.Resume();
-        SetImage(false, playImage);
+        SetImage(true, playImage);
         SetImage(false, pauseImage);
-        SetImage(true, rewindImage);
+        SetImage(false, rewindImage);
         DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-        audioController.AudioReverse();
+        audioController.AudioForward();
     }
 
     public void setRewind(bool value)
@@ -99,6 +99,7 @@ public class TimelineControl : MonoBehaviour
         int j = Mathf.FloorToInt((float)(playableDirector.duration / TIMEFACTOR)) + 1;
         positions = new Vector3[dynamicObjects.Length, j];
         rotations = new Quaternion[dynamicObjects.Length, j];
+        audioController.AudioForward();
     }
 
     void normalVolumeWeight(float weight)

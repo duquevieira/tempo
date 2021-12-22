@@ -38,8 +38,6 @@ public class AudioControl : MonoBehaviour
 
     public void AudioStop()
     {
-        mixer.SetFloat("ForwardMusicVolume", 0f);
-        mixer.SetFloat("BackwardMusicVolume", -80f);
         freezeSnapshot.TransitionTo(transitionTime);
     }
 
