@@ -29,7 +29,7 @@ public class TimelineControl : MonoBehaviour
     private bool isPaused = false;
     public bool isRewinding = false;
     private const double TIMEFACTOR = 0.1;
-    [SerializeField] private Material standard;
+    [SerializeField] private Material[] standards;
 
 
     // Start is called before the first frame update
@@ -143,7 +143,11 @@ public class TimelineControl : MonoBehaviour
                 {
                     Pause();
                 }
-                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
+                foreach(Material standard in standards)
+                {
+                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
+                }
+                
             }
             else
             {
@@ -153,7 +157,10 @@ public class TimelineControl : MonoBehaviour
                     positions[i, timeIndex] = dynamicObjects[i].gameObject.transform.position;
                     rotations[i, timeIndex] = dynamicObjects[i].gameObject.transform.rotation;
                 }
-                standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
+                foreach (Material standard in standards)
+                {
+                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") + (float)timeDifference);
+                }
             }
         }
     }
