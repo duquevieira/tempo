@@ -30,6 +30,7 @@ public class TimelineControl : MonoBehaviour
     public bool isRewinding = false;
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
+    [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
 
 
     // Start is called before the first frame update
@@ -37,6 +38,10 @@ public class TimelineControl : MonoBehaviour
     {
         isPaused = true;
         playableDirector.Pause();
+        foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+        {
+            playing.simulationSpeedScale = 0;
+        }
         SetImage(false, playImage);
         SetImage(true, pauseImage);
         SetImage(false, rewindImage);
@@ -51,6 +56,10 @@ public class TimelineControl : MonoBehaviour
         isPaused = false;
         isRewinding = false;
         playableDirector.Resume();
+        foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+        {
+            playing.simulationSpeedScale = -1;
+        }
         SetImage(true, playImage);
         SetImage(false, pauseImage);
         SetImage(false, rewindImage);
@@ -66,6 +75,10 @@ public class TimelineControl : MonoBehaviour
         if (!isRewinding)
         {
             playableDirector.Resume();
+            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+            {
+                playing.simulationSpeedScale = -1;
+            }
             SetImage(true, playImage);
             SetImage(false, pauseImage);
             SetImage(false, rewindImage);
@@ -77,6 +90,10 @@ public class TimelineControl : MonoBehaviour
         else
         {
             playableDirector.Resume();
+            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+            {
+                playing.simulationSpeedScale = 1;
+            }
             SetImage(false, playImage);
             SetImage(false, pauseImage);
             SetImage(true, rewindImage);
@@ -127,7 +144,10 @@ public class TimelineControl : MonoBehaviour
             {
 
                 if (playableDirector.time > timeDifference)
+                {
                     playableDirector.time -= timeDifference;
+                }
+                    
                 int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
                 for (int i = 0; i < positions.GetLength(0); i++)
                 {
@@ -161,6 +181,7 @@ public class TimelineControl : MonoBehaviour
                 {
                     standard.SetFloat("_isOn", standard.GetFloat("_isOn") + (float)timeDifference);
                 }
+
             }
         }
     }
