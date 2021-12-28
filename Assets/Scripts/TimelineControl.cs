@@ -31,7 +31,8 @@ public class TimelineControl : MonoBehaviour
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
-
+    [SerializeField] private int[] snapshots;
+    private int snapCount;
 
     // Start is called before the first frame update
     public void Pause()
@@ -117,6 +118,8 @@ public class TimelineControl : MonoBehaviour
         positions = new Vector3[dynamicObjects.Length, j];
         rotations = new Quaternion[dynamicObjects.Length, j];
         audioController.AudioForward();
+        snapCount = 0;
+        Debug.Log(playableDirector.duration*60);
     }
 
     void normalVolumeWeight(float weight)
@@ -184,6 +187,28 @@ public class TimelineControl : MonoBehaviour
 
             }
         }
+       foreach(int i in snapshots)
+        {
+            if (playableDirector.time >= ((double)(i - 1) / (double)60) && playableDirector.time <= ((double)(i + 1) / (double)60))
+            {
+                if (snapCount != i)
+                {
+                    Debug.Log(true);
+                    if (!isRewinding)
+                    {
+                        Pause();
+                        snapCount = i;
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                if (snapCount == i)
+                    snapCount = 0;
+            }
+                
+        }
     }
 
     private void SetImage(bool v, Image img)
@@ -203,5 +228,10 @@ public class TimelineControl : MonoBehaviour
     public bool HasEnded()
     {
         return playableDirector.duration == playableDirector.time || (isRewinding & !isPaused);
+    }
+
+    internal bool IsPaused()
+    {
+        return isPaused;
     }
 }

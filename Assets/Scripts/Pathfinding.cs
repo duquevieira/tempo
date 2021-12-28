@@ -33,7 +33,7 @@ public class Pathfinding : MonoBehaviour
     private int footCount;
     private GameObject[] footSteps;
     [SerializeField] TimelineControl[] timelineControllers;
-    //private bool isMoving;
+    private bool isMoving;
     public LayerMask mask;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
@@ -403,33 +403,49 @@ public class Pathfinding : MonoBehaviour
             }
         }
 
+        isMoving = true;
 
-        if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
+        foreach (TimelineControl controller in timelineControllers)
         {
-            if (pathFound.Count > 0)
-            {
-                //Debug.Log("count:"+pathFound.Count);
-                //Debug.Log(playerNavMeshAgent.remainingDistance);
-                //Debug.Log(playerNavMeshAgent.stoppingDistance);
-                playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
-                //Debug.Log(pathFound.Last.Value.name);
-                pathFound.RemoveLast();
-                if (footCount == footSteps.Length)
-                    footCount = 0;
-                if (footSteps[footCount] != null)
-                    Destroy(footSteps[footCount]);
-                footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
-                SetWalkingImage(true);
-                //Debug.Log("count2:" + pathFound.Count);
-                //isMoving =true;
-            }
-            else
-            {
-                SetWalkingImage(false);
-                //isMoving = false;
-            }
-
+            if (controller.IsPaused())
+                isMoving = false;
         }
+
+        if (isMoving)
+        {
+            if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
+            {
+                if (pathFound.Count > 0)
+                {
+                    //Debug.Log("count:"+pathFound.Count);
+                    //Debug.Log(playerNavMeshAgent.remainingDistance);
+                    //Debug.Log(playerNavMeshAgent.stoppingDistance);
+                    playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
+                    //Debug.Log(pathFound.Last.Value.name);
+                    pathFound.RemoveLast();
+                    if (footCount == footSteps.Length)
+                        footCount = 0;
+                    if (footSteps[footCount] != null)
+                        Destroy(footSteps[footCount]);
+                    footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
+                    SetWalkingImage(true);
+                    //Debug.Log("count2:" + pathFound.Count);
+                    //isMoving =true;
+                }
+                else
+                {
+                    SetWalkingImage(false);
+                    //isMoving = false;
+                }
+
+            }
+        }
+        else
+        {
+            playerNavMeshAgent.SetDestination(gameObject.transform.position);
+            pathFound.Clear();
+        }
+        
 
 
     }
