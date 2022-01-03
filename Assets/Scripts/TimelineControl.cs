@@ -33,6 +33,8 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
     private int snapCount;
+    private bool inEnd;
+    private bool inStart;
 
     // Start is called before the first frame update
     public void Pause()
@@ -119,7 +121,11 @@ public class TimelineControl : MonoBehaviour
         rotations = new Quaternion[dynamicObjects.Length, j];
         audioController.AudioForward();
         snapCount = 0;
-        Debug.Log(playableDirector.duration*60);
+
+        inStart = true;
+        inEnd = false;
+
+        Debug.Log(playableDirector.duration);
     }
 
     void normalVolumeWeight(float weight)
@@ -187,13 +193,36 @@ public class TimelineControl : MonoBehaviour
 
             }
         }
-       foreach(int i in snapshots)
+        if (playableDirector.time <= 0)
+        {
+            if (!inStart)
+            {
+                inStart = true;
+                Pause();
+            }
+        }
+        else if(playableDirector.time >= playableDirector.duration)
+        {
+            if (!inEnd)
+            {
+                inEnd = true;
+                Pause();
+            }
+        }
+        else
+        {
+            inStart = false;
+            inEnd = false;
+        }
+
+        if(!inStart&&!inEnd)
+        foreach (int i in snapshots)
         {
             if (playableDirector.time >= ((double)(i - 1) / (double)60) && playableDirector.time <= ((double)(i + 1) / (double)60))
             {
                 if (snapCount != i)
                 {
-                    Debug.Log(true);
+                    //Debug.Log(true);
                     if (!isRewinding)
                     {
                         Pause();
@@ -230,8 +259,19 @@ public class TimelineControl : MonoBehaviour
         return playableDirector.duration == playableDirector.time || (isRewinding & !isPaused);
     }
 
-    internal bool IsPaused()
+    public bool IsPaused()
     {
         return isPaused;
     }
+
+    public bool CanRewind()
+    {
+        return !inStart;
+    }
+
+    public bool CanPlay()
+    {
+        return !inEnd;
+    }
 }
+

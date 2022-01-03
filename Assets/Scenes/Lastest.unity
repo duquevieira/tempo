@@ -56748,7 +56748,7 @@ MonoBehaviour:
   - {fileID: 1424050463}
   - {fileID: 1458341045}
   - {fileID: 1696936144}
-  snapshots: 000000002c010000cc010000
+  snapshots: 2c010000
 --- !u!1001 &1367963785
 PrefabInstance:
   m_ObjectHideFlags: 0

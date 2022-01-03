@@ -331,7 +331,6 @@ public class Pathfinding : MonoBehaviour
             }
         }
         pathFound = new LinkedList<GameObject>();
-        //PrintAdjacency(adjacencylist);
         playerNavMeshAgent.updateRotation = false;
         SetWalkingImage(false);
         SetTapImage(false);
@@ -339,9 +338,8 @@ public class Pathfinding : MonoBehaviour
         footCount = 0;
         foreach (TimelineControl controller in timelineControllers)
         {
-            controller.Play();
+            controller.Pause();
         }
-        //isMoving = false;
     }
 
     private void SetWalkingImage(bool v)
@@ -362,54 +360,20 @@ public class Pathfinding : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButton("Click"))
-        {
-            SetTapImage(true);
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (clickInstance != null)
-                    Destroy(clickInstance);
-                clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
-                djikstra(hit);
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Play();
-                }
-                Debug.Log(pathFound.Count);
-            }
-
-        }
-        if (Input.GetButtonUp("Click"))
-        {
-            SetTapImage(false);
-        }
-
-        if (Input.GetButtonDown("Rewind"))
-        {
-            foreach (TimelineControl controller in timelineControllers)
-            {
-                controller.setRewind(true);
-            }
-            pathFound.Clear();
-            SetWalkingImage(false);
-        }
-        if (Input.GetButtonUp("Rewind"))
-        {
-            foreach (TimelineControl controller in timelineControllers)
-            {
-                controller.Play();
-            }
-        }
-
         isMoving = true;
+        bool canRewind = true;
+        bool canPlay = true;
 
         foreach (TimelineControl controller in timelineControllers)
-        {
-            if (controller.IsPaused())
-                isMoving = false;
-        }
+            if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
+            {
+                if (!controller.IsPaused())
+                    isMoving = false;
+                if (!controller.CanRewind())
+                    canRewind = false;
+                if (!controller.CanPlay())
+                    canPlay = false;
+            }
 
         if (isMoving)
         {
@@ -430,23 +394,63 @@ public class Pathfinding : MonoBehaviour
                     footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
                     SetWalkingImage(true);
                     //Debug.Log("count2:" + pathFound.Count);
-                    //isMoving =true;
                 }
                 else
                 {
                     SetWalkingImage(false);
-                    //isMoving = false;
+                }
+
+            }
+
+            if (Input.GetButton("Click"))
+            {
+                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (clickInstance != null)
+                        Destroy(clickInstance);
+                    clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
+                    djikstra(hit);
+                    //Debug.Log(pathFound.Count);
                 }
 
             }
         }
-        else
+        if (Input.GetButton("Click"))
         {
-            playerNavMeshAgent.SetDestination(gameObject.transform.position);
-            pathFound.Clear();
+            SetTapImage(true);
         }
-        
+        if (Input.GetButtonUp("Click"))
+        {
+            SetTapImage(false);
+        }
 
+        if (canRewind)
+        {
+            if (Input.GetButtonDown("Rewind"))
+            {
+                foreach (TimelineControl controller in timelineControllers)
+                {
+                    controller.setRewind(true);
+                }
+                pathFound.Clear();
+                SetWalkingImage(false);
+                Debug.Log("rewind");
+            }
+        }
+
+        if (canPlay)
+        {
+            if (Input.GetButtonDown("Time"))
+            {
+                foreach (TimelineControl controller in timelineControllers)
+                {
+                    controller.Play();
+                }
+                Debug.Log("play");
+            }
+        }
 
     }
 
@@ -552,7 +556,7 @@ public class Pathfinding : MonoBehaviour
         do
         {
             
-            Debug.Log("found : " + current);
+            //Debug.Log("found : " + current);
             if (current < 0)
             {
                 pathFound.Clear();
