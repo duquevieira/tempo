@@ -11,7 +11,6 @@ using UnityEditorInternal;
 public class Pathfinding : MonoBehaviour
 {
     // Start is called before the first frame update
-    const int FOOTCACHE = 6;
 
     [SerializeField] private GameObject grid;
     int vertices;
@@ -21,19 +20,9 @@ public class Pathfinding : MonoBehaviour
     [SerializeField] private float verticalModifier=1;
     [SerializeField] private float horizontalModifier=1;
     [SerializeField] private NavMeshAgent playerNavMeshAgent;
-    [SerializeField] private Camera playerCamera;
     [SerializeField] private SphereCollider nodeInclusionSphere;
-    [SerializeField] private Image tapImage;
-    [SerializeField] private Image walkingImage;
     private int[] path;
     public LinkedList<GameObject> pathFound;
-    [SerializeField] private GameObject footStep;
-    [SerializeField] private GameObject clickFX;
-    private GameObject clickInstance;
-    private int footCount;
-    private GameObject[] footSteps;
-    [SerializeField] TimelineControl[] timelineControllers;
-    private bool isMoving;
     public LayerMask mask;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
@@ -47,6 +36,31 @@ public class Pathfinding : MonoBehaviour
             }
             Debug.Log(list);
         }
+    }
+
+    public float StoppingDistance()
+    {
+        return playerNavMeshAgent.stoppingDistance;
+    }
+
+    public float RemainingDistance()
+    {
+        return playerNavMeshAgent.remainingDistance;
+    }
+
+    public int PathAmount()
+    {
+        return pathFound.Count;
+    }
+
+    public void SetNextDestination()
+    {
+        //Debug.Log("count:"+pathFound.Count);
+        //Debug.Log(playerNavMeshAgent.remainingDistance);
+        //Debug.Log(playerNavMeshAgent.stoppingDistance);
+        playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
+        //Debug.Log(pathFound.Last.Value.name);
+        pathFound.RemoveLast();
     }
 
     public void PrintArray(int[] array)
@@ -270,6 +284,11 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
+    public void ClearPath()
+    {
+        pathFound.Clear();
+    }
+
     public void AddEdge(int source, int destination, float weight)
     {
         Edge edge = new Edge(source, destination, weight);
@@ -332,129 +351,18 @@ public class Pathfinding : MonoBehaviour
         }
         pathFound = new LinkedList<GameObject>();
         playerNavMeshAgent.updateRotation = false;
-        SetWalkingImage(false);
-        SetTapImage(false);
-        footSteps = new GameObject[FOOTCACHE];
-        footCount = 0;
-        foreach (TimelineControl controller in timelineControllers)
-        {
-            controller.Pause();
-        }
     }
 
-    private void SetWalkingImage(bool v)
-    {
-        var walkingColor = walkingImage.color;
-        walkingColor.a = v ? 1f : .3f;
-        walkingImage.color = walkingColor;
-    }
-
-    private void SetTapImage(bool v)
-    {
-        var tapColor = tapImage.color;
-        tapColor.a = v ? 1f : .3f;
-        tapImage.color = tapColor;
-    }
+    
 
 
     // Update is called once per frame
     void Update()
     {
-        isMoving = true;
-        bool canRewind = true;
-        bool canPlay = true;
-
-        foreach (TimelineControl controller in timelineControllers)
-            if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
-            {
-                if (!controller.IsPaused())
-                    isMoving = false;
-                if (!controller.CanRewind())
-                    canRewind = false;
-                if (!controller.CanPlay())
-                    canPlay = false;
-            }
-
-        if (isMoving)
-        {
-            if (playerNavMeshAgent.remainingDistance <= playerNavMeshAgent.stoppingDistance)
-            {
-                if (pathFound.Count > 0)
-                {
-                    //Debug.Log("count:"+pathFound.Count);
-                    //Debug.Log(playerNavMeshAgent.remainingDistance);
-                    //Debug.Log(playerNavMeshAgent.stoppingDistance);
-                    playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
-                    //Debug.Log(pathFound.Last.Value.name);
-                    pathFound.RemoveLast();
-                    if (footCount == footSteps.Length)
-                        footCount = 0;
-                    if (footSteps[footCount] != null)
-                        Destroy(footSteps[footCount]);
-                    footSteps[footCount++] = Instantiate(footStep, this.gameObject.transform.position, this.gameObject.transform.rotation, this.gameObject.transform.parent);
-                    SetWalkingImage(true);
-                    //Debug.Log("count2:" + pathFound.Count);
-                }
-                else
-                {
-                    SetWalkingImage(false);
-                }
-
-            }
-
-            if (Input.GetButton("Click"))
-            {
-                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
-                {
-                    if (clickInstance != null)
-                        Destroy(clickInstance);
-                    clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
-                    djikstra(hit);
-                    //Debug.Log(pathFound.Count);
-                }
-
-            }
-        }
-        if (Input.GetButton("Click"))
-        {
-            SetTapImage(true);
-        }
-        if (Input.GetButtonUp("Click"))
-        {
-            SetTapImage(false);
-        }
-
-        if (canRewind)
-        {
-            if (Input.GetButtonDown("Rewind"))
-            {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.setRewind(true);
-                }
-                pathFound.Clear();
-                SetWalkingImage(false);
-                Debug.Log("rewind");
-            }
-        }
-
-        if (canPlay)
-        {
-            if (Input.GetButtonDown("Time"))
-            {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Play();
-                }
-                Debug.Log("play");
-            }
-        }
-
+        
     }
 
-    public void djikstra(RaycastHit hit)
+    public void Djikstra(RaycastHit hit)
     {
         int dest = 0;
 

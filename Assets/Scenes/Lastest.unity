@@ -48355,6 +48355,42 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 4010643369812260188, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+--- !u!1 &1168827535 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4012622509079822852, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+  m_PrefabInstance: {fileID: 1168827534}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1168827536 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3496299991837806255, guid: 1f6a787d246cbdb429adcb99f9dbd503, type: 3}
+  m_PrefabInstance: {fileID: 1168827534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168827535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ece8a8908042ff4b81372250bd6a9d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1168827537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168827535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32d64ad51c54204f8ec0798669cde46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tapImage: {fileID: 2061448211}
+  walkingImage: {fileID: 2061448212}
+  timelineControllers:
+  - {fileID: 1367644079}
+  pathfinder: {fileID: 1168827536}
+  footStep: {fileID: 1878560746460868, guid: 2397083e876e5b1408fcc1333f50c082, type: 3}
+  playerCamera: {fileID: 294085568}
+  clickFX: {fileID: 1450638143650814, guid: 9fe1ddc0da27cb44ebeeb8c2befa68bd, type: 3}
 --- !u!1 &1169262061
 GameObject:
   m_ObjectHideFlags: 0
