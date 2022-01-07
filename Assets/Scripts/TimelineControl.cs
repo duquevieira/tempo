@@ -32,6 +32,9 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Material[] standards;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
+    [SerializeField] private Material skyDome;
+    [SerializeField] private Vector2 originalOffset;
+    [SerializeField] private Vector2 skyDomeIncrement;
     private int snapCount;
     private bool inEnd;
     private bool inStart;
@@ -72,40 +75,23 @@ public class TimelineControl : MonoBehaviour
         audioController.AudioForward();
     }
 
-    public void setRewind(bool value)
+    public void Rewind()
     {
-        isRewinding = value;
-        if (!isRewinding)
+        isRewinding = true;
+        isPaused = false;
+        playableDirector.Resume();
+        foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
         {
-            playableDirector.Resume();
-            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
-            {
-                playing.simulationSpeedScale = -1;
-            }
-            SetImage(true, playImage);
-            SetImage(false, pauseImage);
-            SetImage(false, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioForward();
+            playing.simulationSpeedScale = 1;
         }
-        else
-        {
-            playableDirector.Resume();
-            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
-            {
-                playing.simulationSpeedScale = 1;
-            }
-            SetImage(false, playImage);
-            SetImage(false, pauseImage);
-            SetImage(true, rewindImage);
-            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-            audioController.AudioReverse();
-            audioController.AudioToggle();
-        }
+        SetImage(false, playImage);
+        SetImage(false, pauseImage);
+        SetImage(true, rewindImage);
+        DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+        audioController.AudioReverse();
+        audioController.AudioToggle();
     }
 
     void Start()
@@ -124,8 +110,13 @@ public class TimelineControl : MonoBehaviour
 
         inStart = true;
         inEnd = false;
+        /*string[] properties = skyDome.GetTexturePropertyNames();
+        foreach (string s in properties)
+            Debug.Log(s);*/
 
-        Debug.Log(playableDirector.duration);
+        skyDome.SetTextureOffset("_MainTex",originalOffset);
+
+        //Debug.Log(playableDirector.duration);
     }
 
     void normalVolumeWeight(float weight)
@@ -176,7 +167,7 @@ public class TimelineControl : MonoBehaviour
                 {
                     standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
                 }
-                
+                skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") - (skyDomeIncrement * (float)timeDifference));
             }
             else
             {
@@ -190,6 +181,7 @@ public class TimelineControl : MonoBehaviour
                 {
                     standard.SetFloat("_isOn", standard.GetFloat("_isOn") + (float)timeDifference);
                 }
+                skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") + (skyDomeIncrement*(float)timeDifference));
 
             }
         }
@@ -247,13 +239,6 @@ public class TimelineControl : MonoBehaviour
         img.color = Color;
     }
 
-    internal void Resume()
-    {
-        if (isPaused)
-        {
-            Pause();
-        }
-    }
     public bool HasEnded()
     {
         return playableDirector.duration == playableDirector.time || (isRewinding & !isPaused);

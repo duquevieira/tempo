@@ -101,7 +101,7 @@ public class InteractionHandler : MonoBehaviour
             {
                 foreach (TimelineControl controller in timelineControllers)
                 {
-                    controller.setRewind(true);
+                    controller.Rewind();
                 }
                 pathfinder.ClearPath();
                 SetWalkingImage(false);

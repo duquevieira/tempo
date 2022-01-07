@@ -56785,6 +56785,9 @@ MonoBehaviour:
   - {fileID: 1458341045}
   - {fileID: 1696936144}
   snapshots: 2c010000
+  skyDome: {fileID: 2100000, guid: e68f77e240a7f8643b5cc4253dc37516, type: 2}
+  originalOffset: {x: 0.1, y: 0}
+  skyDomeIncrement: {x: 0.1, y: 0}
 --- !u!1001 &1367963785
 PrefabInstance:
   m_ObjectHideFlags: 0
