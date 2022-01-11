@@ -13,14 +13,17 @@ using System;
 public class TimelineControl : MonoBehaviour
 {
     [SerializeField] private PlayableDirector playableDirector = null;
+    [Header("UI")]
     [SerializeField] private Image playImage;
     [SerializeField] private Image rewindImage;
     [SerializeField] private Image pauseImage;
     [SerializeField] private TextMeshProUGUI rewindText;
     [SerializeField] private TextMeshProUGUI playText;
+    [Header("PostFX")]
     [SerializeField] private Volume pauseVolume;
     [SerializeField] private Volume rewindVolume;
     [SerializeField] private Volume normalVolume;
+    [Header("Properties")]
     [SerializeField] private float transitionDuration;
     [SerializeField] private AudioControl audioController;
     [SerializeField] private GameObject[] dynamicObjects;
@@ -35,11 +38,17 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Material skyDome;
     [SerializeField] private Vector2 originalOffset;
     [SerializeField] private Vector2 skyDomeIncrement;
-    private int snapCount;
-    private bool inEnd;
-    private bool inStart;
+    [SerializeField] [Range(1,10)] private float fastForwardFactor = 2;
+    private float target;
+    private bool fastToggle;
+    private bool ignoreTime;
 
     // Start is called before the first frame update
+    public void IgnoreTime(bool b)
+    {
+        ignoreTime = b;
+    }
+
     public void Pause()
     {
         isPaused = true;
@@ -56,6 +65,7 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioStop();
     }
+
 
     public void Play()
     {
@@ -106,10 +116,6 @@ public class TimelineControl : MonoBehaviour
         positions = new Vector3[dynamicObjects.Length, j];
         rotations = new Quaternion[dynamicObjects.Length, j];
         audioController.AudioForward();
-        snapCount = 0;
-
-        inStart = true;
-        inEnd = false;
         /*string[] properties = skyDome.GetTexturePropertyNames();
         foreach (string s in properties)
             Debug.Log(s);*/
@@ -134,20 +140,80 @@ public class TimelineControl : MonoBehaviour
         rewindVolume.weight = weight;
     }
 
+    public void Fast()
+    {
+        fastToggle = true; 
+        float auxMin = float.MaxValue;
+        for(int i = 0; i<snapshots.Length;i++)
+        {
+            int snap = snapshots[i];
+            float calc = Math.Abs((float)snap / (float)60 - (float)playableDirector.time);
+            if (calc < auxMin)
+            {
+                auxMin = calc;
+                target = (float)snap / (float)60;
+            }
+        }
+        Debug.Log(playableDirector.playableGraph.GetRootPlayable(0).GetSpeed());
+        if (target < playableDirector.time)
+        {
+            Rewind();
+            Debug.Log("<");
+        }
+        else
+        {
+            playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(fastForwardFactor);
+            Play();
+            Debug.Log(">");
+            
+        }
+        Debug.Log(playableDirector.playableGraph.GetRootPlayable(0).GetSpeed());
+    }
+
     // Update is called once per frame
     private void Update()
     {
-        if (!isPaused)
+        double timeDifference = Time.deltaTime;
+
+        float auxTimeFactor = 1;
+        if (fastToggle)
+            auxTimeFactor = fastForwardFactor;
+
+        if (playableDirector.time <= 0)
         {
-            double timeDifference = Time.deltaTime;
             if (isRewinding)
             {
-
-                if (playableDirector.time > timeDifference)
-                {
-                    playableDirector.time -= timeDifference;
-                }
-                    
+                Pause();
+                fastToggle = false;
+                //playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
+            }
+        }
+        else if (playableDirector.time >= playableDirector.duration)
+        {
+            if (!isRewinding)
+            {
+                Pause();
+                fastToggle = false;
+                //playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
+            }
+        }
+        if (!ignoreTime)
+        {
+            if (playableDirector.time >= target - timeDifference * auxTimeFactor && playableDirector.time <= target + timeDifference * auxTimeFactor)
+            {
+                playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
+                Pause();
+                fastToggle = false;
+                
+            }
+        }
+        if (!isPaused)
+        {
+            if (isRewinding)
+            {
+                
+                playableDirector.time -= timeDifference*auxTimeFactor;
+                   
                 int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
                 for (int i = 0; i < positions.GetLength(0); i++)
                 {
@@ -159,18 +225,19 @@ public class TimelineControl : MonoBehaviour
                     positions[i, timeIndex] = Vector3.zero;
                     rotations[i, timeIndex] = Quaternion.identity;
                 }
-                if (playableDirector.time < timeDifference)
-                {
-                    Pause();
-                }
+                
                 foreach(Material standard in standards)
                 {
-                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference);
+                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference*auxTimeFactor);
                 }
                 skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") - (skyDomeIncrement * (float)timeDifference));
             }
             else
             {
+                if (fastToggle)
+                {
+                    playableDirector.time += timeDifference * auxTimeFactor - timeDifference;
+                }
                 int timeIndex = Mathf.FloorToInt((float)(playableDirector.time / TIMEFACTOR));
                 for (int i = 0; i < positions.GetLength(0); i++)
                 {
@@ -179,56 +246,11 @@ public class TimelineControl : MonoBehaviour
                 }
                 foreach (Material standard in standards)
                 {
-                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") + (float)timeDifference);
+                    standard.SetFloat("_isOn", standard.GetFloat("_isOn") + (float)timeDifference*auxTimeFactor);
                 }
                 skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") + (skyDomeIncrement*(float)timeDifference));
 
             }
-        }
-        if (playableDirector.time <= 0)
-        {
-            if (!inStart)
-            {
-                inStart = true;
-                Pause();
-            }
-        }
-        else if(playableDirector.time >= playableDirector.duration)
-        {
-            if (!inEnd)
-            {
-                inEnd = true;
-                Pause();
-            }
-        }
-        else
-        {
-            inStart = false;
-            inEnd = false;
-        }
-
-        if(!inStart&&!inEnd)
-        foreach (int i in snapshots)
-        {
-            if (playableDirector.time >= ((double)(i - 1) / (double)60) && playableDirector.time <= ((double)(i + 1) / (double)60))
-            {
-                if (snapCount != i)
-                {
-                    //Debug.Log(true);
-                    if (!isRewinding)
-                    {
-                        Pause();
-                        snapCount = i;
-                    }
-                    break;
-                }
-            }
-            else
-            {
-                if (snapCount == i)
-                    snapCount = 0;
-            }
-                
         }
     }
 
@@ -251,12 +273,12 @@ public class TimelineControl : MonoBehaviour
 
     public bool CanRewind()
     {
-        return !inStart;
+        return playableDirector.time>0;
     }
 
     public bool CanPlay()
     {
-        return !inEnd;
+        return playableDirector.time <playableDirector.duration;
     }
 }
 

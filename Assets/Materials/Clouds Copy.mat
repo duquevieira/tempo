@@ -119,7 +119,7 @@ Material:
     - _Glossiness: 0
     - _GlossinessSource: 0
     - _GlossyReflections: 1
-    - _Height: 40
+    - _Height: 10
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
@@ -142,7 +142,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
-    - _isOn: 2.6326406
+    - _isOn: 256.43097
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 0.391}
     - _Color: {r: 1, g: 1, b: 1, a: 1}

@@ -102,10 +102,19 @@ public class InteractionHandler : MonoBehaviour
                 foreach (TimelineControl controller in timelineControllers)
                 {
                     controller.Rewind();
+                    controller.IgnoreTime(true);
                 }
                 pathfinder.ClearPath();
                 SetWalkingImage(false);
                 //Debug.Log("rewind");
+            }
+            if (Input.GetButtonUp("Rewind"))
+            {
+                foreach (TimelineControl controller in timelineControllers)
+                {
+                    controller.Fast();
+                    controller.IgnoreTime(false);
+                }
             }
         }
 
@@ -116,8 +125,19 @@ public class InteractionHandler : MonoBehaviour
                 foreach (TimelineControl controller in timelineControllers)
                 {
                     controller.Play();
+                    controller.IgnoreTime(true);
                 }
                 //Debug.Log("play");
+                pathfinder.ClearPath();
+                SetWalkingImage(false);
+            }
+            if (Input.GetButtonUp("Time"))
+            {
+                foreach (TimelineControl controller in timelineControllers)
+                {
+                    controller.Fast();
+                    controller.IgnoreTime(false);
+                }
             }
         }
 
