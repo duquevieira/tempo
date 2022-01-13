@@ -17,7 +17,10 @@ public class InteractionHandler : MonoBehaviour
     [SerializeField] private GameObject footStep;
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject clickFX;
+    [SerializeField] private float holdTime = 1;
     private GameObject clickInstance;
+    private Vector2 downClickPoint;
+    private float timeOnClick;
 
     // Start is called before the first frame update
     void Start()
@@ -70,77 +73,95 @@ public class InteractionHandler : MonoBehaviour
                 }
 
             }
-
-            if (Input.GetButton("Click"))
+            if (Input.GetButtonUp("Click"))
             {
                 Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit))
                 {
-                    if (clickInstance != null)
-                        Destroy(clickInstance);
-                    clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
-                    pathfinder.Djikstra(hit);
-                    //Debug.Log(pathFound.Count);
+                    if(Time.realtimeSinceStartup - timeOnClick < holdTime)
+                    {
+                        pathfinder.Djikstra(hit);
+                        //Debug.Log(pathFound.Count);
+                    }
+                    
                 }
 
+            }
+        }
+        if (Input.GetButtonDown("Click"))
+        {
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            SetTapImage(true);
+            if (Physics.Raycast(ray, out hit))
+            {
+                downClickPoint = playerCamera.WorldToScreenPoint(hit.point);
+                timeOnClick = Time.realtimeSinceStartup;
+                if (clickInstance != null)
+                    Destroy(clickInstance);
+                clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
+                Debug.Log(timeOnClick);
             }
         }
         if (Input.GetButton("Click"))
         {
-            SetTapImage(true);
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (Time.realtimeSinceStartup - timeOnClick >= holdTime)
+                {
+                    Vector2 upClickPoint = playerCamera.WorldToScreenPoint(hit.point);
+                    int height = Screen.height;
+                    int width = Screen.width;
+                    if (upClickPoint.x < downClickPoint.x)
+                    {
+                        if (canRewind)
+                        {
+                            foreach (TimelineControl controller in timelineControllers)
+                            {
+                                if (!controller.IsRewinding() || controller.IsPaused())
+                                {
+                                    controller.Rewind();
+                                    controller.IgnoreTime(true);
+                                    pathfinder.ClearPath();
+                                    SetWalkingImage(false);
+                                }
+                            }
+                            Debug.Log("rewind");
+                        }
+                    }
+                    else
+                    {
+                        if (canPlay)
+                        {
+                            foreach (TimelineControl controller in timelineControllers)
+                            {
+                                if (controller.IsRewinding()||controller.IsPaused())
+                                {
+                                    controller.Play();
+                                    controller.IgnoreTime(true);
+                                    pathfinder.ClearPath();
+                                    SetWalkingImage(false);
+                                }
+                            }
+                            Debug.Log("play");
+                        }
+                    }
+                }
+            }
         }
         if (Input.GetButtonUp("Click"))
         {
             SetTapImage(false);
-        }
-
-        if (canRewind)
-        {
-            if (Input.GetButtonDown("Rewind"))
+            foreach (TimelineControl controller in timelineControllers)
             {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Rewind();
-                    controller.IgnoreTime(true);
-                }
-                pathfinder.ClearPath();
-                SetWalkingImage(false);
-                //Debug.Log("rewind");
-            }
-            if (Input.GetButtonUp("Rewind"))
-            {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Fast();
-                    controller.IgnoreTime(false);
-                }
+                controller.Fast();
+                controller.IgnoreTime(false);
             }
         }
-
-        if (canPlay)
-        {
-            if (Input.GetButtonDown("Time"))
-            {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Play();
-                    controller.IgnoreTime(true);
-                }
-                //Debug.Log("play");
-                pathfinder.ClearPath();
-                SetWalkingImage(false);
-            }
-            if (Input.GetButtonUp("Time"))
-            {
-                foreach (TimelineControl controller in timelineControllers)
-                {
-                    controller.Fast();
-                    controller.IgnoreTime(false);
-                }
-            }
-        }
-
     }
 
     private void SetWalkingImage(bool v)

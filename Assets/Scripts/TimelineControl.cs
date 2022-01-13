@@ -30,7 +30,7 @@ public class TimelineControl : MonoBehaviour
     private Vector3[,] positions;
     private Quaternion[,] rotations;
     private bool isPaused = false;
-    public bool isRewinding = false;
+    private bool isRewinding = false;
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
@@ -269,6 +269,11 @@ public class TimelineControl : MonoBehaviour
     public bool IsPaused()
     {
         return isPaused;
+    }
+
+    public bool IsRewinding()
+    {
+        return isRewinding;
     }
 
     public bool CanRewind()
