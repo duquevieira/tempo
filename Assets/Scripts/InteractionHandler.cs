@@ -12,7 +12,6 @@ public class InteractionHandler : MonoBehaviour
     [SerializeField] private Image walkingImage;
     private int footCount;
     private GameObject[] footSteps;
-    [SerializeField] TimelineControl[] timelineControllers;
     [SerializeField] Pathfinding pathfinder;
     [SerializeField] private GameObject footStep;
     [SerializeField] private Camera playerCamera;
@@ -21,6 +20,7 @@ public class InteractionHandler : MonoBehaviour
     private GameObject clickInstance;
     private Vector2 downClickPoint;
     private float timeOnClick;
+    [SerializeField] private TimelineHandler[] timelineHandlers;
 
     // Start is called before the first frame update
     void Start()
@@ -30,10 +30,7 @@ public class InteractionHandler : MonoBehaviour
         SetTapImage(false);
         footSteps = new GameObject[FOOTCACHE];
         footCount = 0;
-        foreach (TimelineControl controller in timelineControllers)
-        {
-            controller.Pause();
-        }
+        
     }
 
     // Update is called once per frame
@@ -42,9 +39,8 @@ public class InteractionHandler : MonoBehaviour
         bool isMoving = true;
         bool canRewind = true;
         bool canPlay = true;
-
-        foreach (TimelineControl controller in timelineControllers)
-            if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
+        if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
+            foreach (TimelineHandler controller in timelineHandlers)
             {
                 if (!controller.IsPaused())
                     isMoving = false;
@@ -53,6 +49,7 @@ public class InteractionHandler : MonoBehaviour
                 if (!controller.CanPlay())
                     canPlay = false;
             }
+
         if (isMoving)
         {
             if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
@@ -120,16 +117,16 @@ public class InteractionHandler : MonoBehaviour
                     {
                         if (canRewind)
                         {
-                            foreach (TimelineControl controller in timelineControllers)
+                            TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
+                            if ( aux != null)
                             {
-                                if (!controller.IsRewinding() || controller.IsPaused())
+                                if(aux.Rewind())
                                 {
-                                    controller.Rewind();
-                                    controller.IgnoreTime(true);
                                     pathfinder.ClearPath();
                                     SetWalkingImage(false);
                                 }
                             }
+                            
                             Debug.Log("rewind");
                         }
                     }
@@ -137,12 +134,11 @@ public class InteractionHandler : MonoBehaviour
                     {
                         if (canPlay)
                         {
-                            foreach (TimelineControl controller in timelineControllers)
+                            TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
+                            if (aux != null)
                             {
-                                if (controller.IsRewinding()||controller.IsPaused())
+                                if (aux.Play())
                                 {
-                                    controller.Play();
-                                    controller.IgnoreTime(true);
                                     pathfinder.ClearPath();
                                     SetWalkingImage(false);
                                 }
@@ -156,11 +152,18 @@ public class InteractionHandler : MonoBehaviour
         if (Input.GetButtonUp("Click"))
         {
             SetTapImage(false);
-            foreach (TimelineControl controller in timelineControllers)
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
             {
-                controller.Fast();
-                controller.IgnoreTime(false);
+                TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
+                if (aux != null)
+                {
+                    aux.Fast();
+                }
             }
+                
+           
         }
     }
 
