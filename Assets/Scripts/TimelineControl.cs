@@ -66,7 +66,7 @@ public class TimelineControl : MonoBehaviour
         audioController.AudioStop();
     }
 
-
+    
     public void Play()
     {
         isPaused = false;
@@ -103,7 +103,6 @@ public class TimelineControl : MonoBehaviour
         audioController.AudioReverse();
         audioController.AudioToggle();
     }
-
     void Start()
     {
         playableDirector.time = 0;
