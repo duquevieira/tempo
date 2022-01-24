@@ -12,6 +12,8 @@ public class NodeConnections : MonoBehaviour
     private int verify = 0;
     public GameObject myPreFab;
     [SerializeField] private bool auto;
+    [SerializeField] private GameObject portal;
+    [SerializeField] private GameObject forward;
 
     private void OnValidate()
     {
@@ -70,5 +72,15 @@ public class NodeConnections : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public GameObject getPortal()
+    {
+        return portal;
+    }
+
+    public GameObject getForward()
+    {
+        return forward;
     }
 }

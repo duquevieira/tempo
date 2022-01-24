@@ -67,6 +67,7 @@ public class InteractionHandler : MonoBehaviour
                 else
                 {
                     SetWalkingImage(false);
+                    pathfinder.CheckRestrictions();
                 }
 
             }

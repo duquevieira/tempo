@@ -24,6 +24,7 @@ public class Pathfinding : MonoBehaviour
     private int[] path;
     public LinkedList<GameObject> pathFound;
     public LayerMask mask;
+    private GameObject current;
 
     public void PrintAdjacency(LinkedList<Edge>[] adjacency)
     {
@@ -58,7 +59,8 @@ public class Pathfinding : MonoBehaviour
         //Debug.Log("count:"+pathFound.Count);
         //Debug.Log(playerNavMeshAgent.remainingDistance);
         //Debug.Log(playerNavMeshAgent.stoppingDistance);
-        playerNavMeshAgent.SetDestination(pathFound.Last.Value.transform.position);
+        current = pathFound.Last.Value;
+        playerNavMeshAgent.SetDestination(current.transform.position);
         //Debug.Log(pathFound.Last.Value.name);
         pathFound.RemoveLast();
     }
@@ -316,6 +318,31 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
+    public void CheckRestrictions()
+    {
+        if (playerNavMeshAgent.velocity.magnitude <= 0.01)
+        {
+            NodeConnections nc = current.GetComponent<NodeConnections>();
+            if (nc != null && nc.getPortal() != null)
+            {
+                pathFound.Clear();
+                
+                playerNavMeshAgent.enabled = false;
+                playerNavMeshAgent.SetDestination(nc.getPortal().transform.position);
+                gameObject.transform.position = nc.getPortal().transform.position;
+                playerNavMeshAgent.enabled = true;
+            }
+            else
+            {
+                if (nc != null && nc.getForward() != null)
+                {
+                    pathFound.AddLast(nc.getForward());
+                }
+            }
+        }
+        
+    }
+
     void OnTriggerExit(Collider col)
     {
         if (mask == (mask | (1 << col.gameObject.layer)))
@@ -351,6 +378,7 @@ public class Pathfinding : MonoBehaviour
         }
         pathFound = new LinkedList<GameObject>();
         playerNavMeshAgent.updateRotation = false;
+        current = this.gameObject;
     }
 
     
