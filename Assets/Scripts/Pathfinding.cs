@@ -377,7 +377,6 @@ public class Pathfinding : MonoBehaviour
             }
         }
         pathFound = new LinkedList<GameObject>();
-        playerNavMeshAgent.updateRotation = false;
         current = this.gameObject;
     }
 
