@@ -39,6 +39,11 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Vector2 originalOffset;
     [SerializeField] private Vector2 skyDomeIncrement;
     [SerializeField] [Range(1,10)] private float fastForwardFactor = 2;
+    [SerializeField] Slider slider;
+    [SerializeField] GameObject point;
+    [SerializeField] RectTransform bar;
+    
+    
     private float target;
     private bool fastToggle;
     private bool ignoreTime;
@@ -120,6 +125,27 @@ public class TimelineControl : MonoBehaviour
             Debug.Log(s);*/
 
         skyDome.SetTextureOffset("_MainTex",originalOffset);
+        slider.maxValue = (float)playableDirector.duration;
+        slider.value = 0;
+        
+        float max = bar.rect.width;
+
+        foreach(int i in snapshots)
+        {
+            GameObject ball = Instantiate(point, bar.gameObject.transform);
+            float factor = (float)i / ((float)playableDirector.duration * (float)60);
+            if (max * factor <= ball.GetComponent<RectTransform>().rect.width / (float)2)
+            {
+                Debug.Log("rectstart: " + ball.GetComponent<RectTransform>().rect.width / (float)2);
+                ball.GetComponent<RectTransform>().anchoredPosition = new Vector2(ball.GetComponent<RectTransform>().rect.width / (float)2,0);
+            }
+            else
+            {
+               Debug.Log("rect: " + max * factor);
+                ball.GetComponent<RectTransform>().anchoredPosition = new Vector2(max*factor- ball.GetComponent<RectTransform>().rect.width / (float)2, 0);
+            }
+
+        }
 
         //Debug.Log(playableDirector.duration);
     }
@@ -250,6 +276,7 @@ public class TimelineControl : MonoBehaviour
                 skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") + (skyDomeIncrement*(float)timeDifference));
 
             }
+            slider.value = (float)playableDirector.time;
         }
     }
 
