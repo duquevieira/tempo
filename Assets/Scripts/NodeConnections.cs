@@ -19,7 +19,7 @@ public class NodeConnections : MonoBehaviour
     {
         if (myPreFab.GetComponent<NodeConnections>().auto)
             IntegrityCheck();
-        
+
     }
 
     private void IntegrityCheck()
@@ -28,18 +28,20 @@ public class NodeConnections : MonoBehaviour
         {
             for (int i = 0; i < Connections.Length; i++)
             {
-                
+
                 if (i >= verify)
                 {
                     AddConnection(i);
                     verify++;
-                }else if (Connections[i] == null)
+                }
+                else if (Connections[i] == null)
                 {
                     AddConnection(i);
                 }
 
             }
-        }else if(Connections.Length == verify)
+        }
+        else if (Connections.Length == verify)
         {
             for (int i = 0; i < Connections.Length; i++)
             {
@@ -65,13 +67,13 @@ public class NodeConnections : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public GameObject getPortal()
@@ -84,3 +86,4 @@ public class NodeConnections : MonoBehaviour
         return forward;
     }
 }
+

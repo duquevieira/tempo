@@ -328,16 +328,13 @@ public class Pathfinding : MonoBehaviour
                 pathFound.Clear();
                 
                 playerNavMeshAgent.enabled = false;
-                playerNavMeshAgent.SetDestination(nc.getPortal().transform.position);
                 gameObject.transform.position = nc.getPortal().transform.position;
                 playerNavMeshAgent.enabled = true;
+
             }
-            else
+            if (nc != null && nc.getForward() != null)
             {
-                if (nc != null && nc.getForward() != null)
-                {
-                    pathFound.AddLast(nc.getForward());
-                }
+                pathFound.AddLast(nc.getForward());
             }
         }
         

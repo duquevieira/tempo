@@ -21,6 +21,8 @@ public class InteractionHandler : MonoBehaviour
     private Vector2 downClickPoint;
     private float timeOnClick;
     [SerializeField] private TimelineHandler[] timelineHandlers;
+    [SerializeField] LayerMask raycastMask;
+    private TimelineHandler collidedTimeline;
 
     // Start is called before the first frame update
     void Start()
@@ -75,7 +77,7 @@ public class InteractionHandler : MonoBehaviour
             {
                 Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit, raycastMask))
                 {
                     if(Time.realtimeSinceStartup - timeOnClick < holdTime)
                     {
@@ -99,18 +101,19 @@ public class InteractionHandler : MonoBehaviour
                 if (clickInstance != null)
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
+                collidedTimeline = hit.collider.gameObject.GetComponent<TimelineHandler>();
                 Debug.Log(timeOnClick);
             }
         }
         if (Input.GetButton("Click"))
         {
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            
-            if (Physics.Raycast(ray, out hit))
+            if (Time.realtimeSinceStartup - timeOnClick >= holdTime)
             {
-                if (Time.realtimeSinceStartup - timeOnClick >= holdTime)
+                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
                 {
+                
                     Vector2 upClickPoint = playerCamera.WorldToScreenPoint(hit.point);
                     int height = Screen.height;
                     int width = Screen.width;
@@ -153,18 +156,11 @@ public class InteractionHandler : MonoBehaviour
         if (Input.GetButtonUp("Click"))
         {
             SetTapImage(false);
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            if (collidedTimeline != null&& Time.realtimeSinceStartup - timeOnClick >= holdTime)
             {
-                TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
-                if (aux != null)
-                {
-                    aux.Fast();
-                }
+                collidedTimeline.Fast();
+                collidedTimeline = null;
             }
-                
-           
         }
     }
 
