@@ -42,6 +42,7 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] Slider slider;
     [SerializeField] GameObject point;
     [SerializeField] RectTransform bar;
+    [SerializeField] [Range(0, 1)]  private float tolerence = 1;
     
     
     private float target;
@@ -224,7 +225,7 @@ public class TimelineControl : MonoBehaviour
         }
         if (!ignoreTime)
         {
-            if (playableDirector.time >= target - timeDifference * auxTimeFactor && playableDirector.time <= target + timeDifference * auxTimeFactor)
+            if (playableDirector.time >= target - (timeDifference * auxTimeFactor)*tolerence && playableDirector.time <= target + (timeDifference * auxTimeFactor)*tolerence)
             {
                 playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
                 Pause();

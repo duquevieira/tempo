@@ -57402,6 +57402,7 @@ MonoBehaviour:
   slider: {fileID: 491181392}
   point: {fileID: 968194367296131230, guid: f12cdd3ac6bb1f645b7a462a6900aaf9, type: 3}
   bar: {fileID: 491181391}
+  tolerence: 0.512
 --- !u!1001 &1367963785
 PrefabInstance:
   m_ObjectHideFlags: 0
