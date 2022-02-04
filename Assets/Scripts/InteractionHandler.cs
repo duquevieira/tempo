@@ -117,37 +117,33 @@ public class InteractionHandler : MonoBehaviour
                     Vector2 upClickPoint = playerCamera.WorldToScreenPoint(hit.point);
                     int height = Screen.height;
                     int width = Screen.width;
-                    if (upClickPoint.x < downClickPoint.x)
+                    TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
+                    if (aux != null&&hit.collider.bounds.Contains(gameObject.transform.position))
                     {
-                        if (canRewind)
+                        if (upClickPoint.x < downClickPoint.x)
                         {
-                            TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
-                            if ( aux != null)
+                            if (canRewind)
                             {
-                                if(aux.Rewind())
+                                if (aux.Rewind())
                                 {
                                     pathfinder.ClearPath();
                                     SetWalkingImage(false);
                                 }
+                                Debug.Log("rewind");
                             }
-                            
-                            Debug.Log("rewind");
                         }
-                    }
-                    else
-                    {
-                        if (canPlay)
+                        else
                         {
-                            TimelineHandler aux = hit.collider.gameObject.GetComponent<TimelineHandler>();
-                            if (aux != null)
+                            if (canPlay)
                             {
+                                
                                 if (aux.Play())
                                 {
                                     pathfinder.ClearPath();
                                     SetWalkingImage(false);
                                 }
+                                Debug.Log("play");
                             }
-                            Debug.Log("play");
                         }
                     }
                 }
