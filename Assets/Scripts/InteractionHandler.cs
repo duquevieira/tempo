@@ -77,7 +77,7 @@ public class InteractionHandler : MonoBehaviour
             {
                 Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, raycastMask))
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
                 {
                     if(Time.realtimeSinceStartup - timeOnClick < holdTime)
                     {
@@ -94,14 +94,16 @@ public class InteractionHandler : MonoBehaviour
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             SetTapImage(true);
-            if (Physics.Raycast(ray, out hit))
+            if(Physics.Raycast(ray, out hit)){
+                collidedTimeline = hit.collider.gameObject.GetComponent<TimelineHandler>();
+            }
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
             {
                 downClickPoint = playerCamera.WorldToScreenPoint(hit.point);
                 timeOnClick = Time.realtimeSinceStartup;
                 if (clickInstance != null)
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
-                collidedTimeline = hit.collider.gameObject.GetComponent<TimelineHandler>();
                 Debug.Log(timeOnClick);
             }
         }
