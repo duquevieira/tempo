@@ -33,6 +33,7 @@ public class TimelineControl : MonoBehaviour
     private bool isRewinding = false;
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
+    [SerializeField] private Material[] hoverMaterials;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
     [SerializeField] private Material skyDome;
@@ -70,6 +71,10 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(pauseVolume.weight, 1, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioStop();
+        foreach(Material hover in hoverMaterials)
+        {
+            hover.SetFloat("_isOn", 1.0f);
+        }
     }
 
     
@@ -89,6 +94,10 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioForward();
+        foreach (Material hover in hoverMaterials)
+        {
+            hover.SetFloat("_isOn", 0.0f);
+        }
     }
 
     public void Rewind()
@@ -108,6 +117,10 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioReverse();
         audioController.AudioToggle();
+        foreach (Material hover in hoverMaterials)
+        {
+            hover.SetFloat("_isOn", 0.0f);
+        }
     }
     void Start()
     {
@@ -146,6 +159,10 @@ public class TimelineControl : MonoBehaviour
                 ball.GetComponent<RectTransform>().anchoredPosition = new Vector2(max*factor- ball.GetComponent<RectTransform>().rect.width / (float)2, 0);
             }
 
+        }
+        foreach (Material hover in hoverMaterials)
+        {
+            hover.SetFloat("_isOn", 1.0f);
         }
 
         //Debug.Log(playableDirector.duration);
