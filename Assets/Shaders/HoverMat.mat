@@ -100,7 +100,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _Bend: 0.01
+    - _Bend: 0.001
     - _Blend: 0
     - _BumpScale: 1
     - _CastShadows: 1
