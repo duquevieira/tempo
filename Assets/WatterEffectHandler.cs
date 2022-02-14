@@ -17,6 +17,7 @@ public class WatterEffectHandler : MonoBehaviour
     private int index;
     [SerializeField] BoxCollider box;
     const int MAXCACHE = 30;
+    [SerializeField] private bool onStart;
 
     // Start is called before the first frame update
     void Start()
@@ -40,25 +41,34 @@ public class WatterEffectHandler : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float randomNum = Random.Range(0, 1f);
-        if (randomNum < riples)
+        if (onStart)
         {
-            float x = Random.Range(minX, maxX);
-            float y = maxY;
-            float z = Random.Range(minX, maxX);
-            if(cache[index] != null)
+            float randomNum = Random.Range(0, 1f);
+            if (randomNum < riples)
             {
-                Destroy(cache[index]);
-            }
-            cache[index] = Instantiate(prefab,new Vector3(x,y,z), Quaternion.identity, transform);
-            cache[index].transform.localScale = scale;
-            if (index == MAXCACHE-1)
-            {
+                float x = Random.Range(minX, maxX);
+                float y = maxY;
+                float z = Random.Range(minX, maxX);
+                if (cache[index] != null)
+                {
+                    Destroy(cache[index]);
+                }
+                cache[index] = Instantiate(prefab, new Vector3(x, y, z), Quaternion.identity, transform);
+                cache[index].transform.localScale = scale;
+                if (index == MAXCACHE - 1)
+                {
 
-                index = 0;
+                    index = 0;
+                }
+                else
+                    index++;
             }
-            else
-                index++;
         }
+       
+    }
+
+    public void Toggle(bool value)
+    {
+        onStart = value;
     }
 }

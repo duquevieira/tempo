@@ -34,6 +34,7 @@ public class TimelineControl : MonoBehaviour
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
     [SerializeField] private Material[] hoverMaterials;
+    [SerializeField] WatterEffectHandler[] watterhandlers;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
     [SerializeField] private Material skyDome;
@@ -75,6 +76,10 @@ public class TimelineControl : MonoBehaviour
         {
             hover.SetFloat("_isOn", 1.0f);
         }
+        foreach(WatterEffectHandler handler in watterhandlers)
+        {
+            handler.Toggle(false);
+        }
     }
 
     
@@ -97,6 +102,10 @@ public class TimelineControl : MonoBehaviour
         foreach (Material hover in hoverMaterials)
         {
             hover.SetFloat("_isOn", 0.0f);
+        }
+        foreach (WatterEffectHandler handler in watterhandlers)
+        {
+            handler.Toggle(true);
         }
     }
 
@@ -121,6 +130,10 @@ public class TimelineControl : MonoBehaviour
         {
             hover.SetFloat("_isOn", 0.0f);
         }
+        foreach (WatterEffectHandler handler in watterhandlers)
+        {
+            handler.Toggle(true);
+        }
     }
     void Start()
     {
@@ -140,29 +153,21 @@ public class TimelineControl : MonoBehaviour
 
         skyDome.SetTextureOffset("_MainTex",originalOffset);
         slider.maxValue = (float)playableDirector.duration;
-        slider.value = 0;
         
-        float max = bar.rect.width;
-
-        foreach(int i in snapshots)
-        {
-            GameObject ball = Instantiate(point, bar.gameObject.transform);
-            float factor = (float)i / ((float)playableDirector.duration * (float)60);
-            if (max * factor <= ball.GetComponent<RectTransform>().rect.width / (float)2)
-            {
-                Debug.Log("rectstart: " + ball.GetComponent<RectTransform>().rect.width / (float)2);
-                ball.GetComponent<RectTransform>().anchoredPosition = new Vector2(ball.GetComponent<RectTransform>().rect.width / (float)2,0);
-            }
-            else
-            {
-               Debug.Log("rect: " + max * factor);
-                ball.GetComponent<RectTransform>().anchoredPosition = new Vector2(max*factor- ball.GetComponent<RectTransform>().rect.width / (float)2, 0);
-            }
-
-        }
         foreach (Material hover in hoverMaterials)
         {
             hover.SetFloat("_isOn", 1.0f);
+        }
+        slider.maxValue = (float)playableDirector.duration;
+        slider.minValue = 0;
+        slider.value = 0;
+        foreach (int i in snapshots)
+        {
+            GameObject ball = Instantiate(point, bar.gameObject.transform);
+            float factor = (float)i / ((float)playableDirector.duration * (float)60);
+            ball.transform.position = new Vector3(bar.position.x-(bar.rect.width/2), bar.position.y, 0);
+            ball.transform.Translate(new Vector3(bar.rect.width*factor,0,0));
+
         }
 
         //Debug.Log(playableDirector.duration);

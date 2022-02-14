@@ -117,7 +117,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
-    - _isOn: 0.09
+    - _isOn: 10.665512
     m_Colors:
     - _BaseColor: {r: 0.07904412, g: 0.30636406, b: 0.31617647, a: 0.69}
     - _Color: {r: 0, g: 0.2780699, b: 0.2924528, a: 1}
