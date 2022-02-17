@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TimelineHandler : MonoBehaviour
 {
-
     [SerializeField] TimelineControl[] timelineControllers;
     // Start is called before the first frame update
     void Start()
@@ -35,6 +36,14 @@ public class TimelineHandler : MonoBehaviour
         return false;
     }
 
+    internal void Activate()
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.InititalizeSlider();
+        }
+    }
+
     public bool CanRewind()
     {
         foreach (TimelineControl controller in timelineControllers)
@@ -43,6 +52,15 @@ public class TimelineHandler : MonoBehaviour
         }
         return false;
     }
+
+    internal void Deactivate()
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.ResetSlider();
+        }
+    }
+
     public bool CanPlay()
     {
         foreach (TimelineControl controller in timelineControllers)
@@ -66,6 +84,15 @@ public class TimelineHandler : MonoBehaviour
         }
         return result;
     }
+
+    public void SetNoSpeed()
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.SetNoSpeed();
+        }
+    }
+
     public bool Play()
     {
         bool result = false;

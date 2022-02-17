@@ -34,6 +34,9 @@ public class TimelineControl : MonoBehaviour
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
     [SerializeField] private Material[] hoverMaterials;
+    private List<GameObject> snapimages;
+    
+
     [SerializeField] WatterEffectHandler[] watterhandlers;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
@@ -46,12 +49,97 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] RectTransform bar;
     [SerializeField] [Range(0, 1)]  private float tolerence = 1;
     
-    
+
+    private float previousTime;
     private float target;
     private bool fastToggle;
     private bool ignoreTime;
 
+    internal void ResetSlider()
+    {
+        foreach(GameObject i in snapimages)
+        {
+            Destroy(i);
+        }
+        slider.gameObject.SetActive(false);//can not be disabled
+    }
+    public void InititalizeSlider()
+    {
+        slider.gameObject.SetActive(true);//can not be anabled if not disabled
+        snapimages = new List<GameObject>();
+        slider.maxValue = (float)playableDirector.duration;
+        slider.minValue = 0;
+        slider.value = 0;
+        foreach (int i in snapshots)
+        {
+            GameObject ball = Instantiate(point, bar.gameObject.transform);
+            float factor = (float)i / ((float)playableDirector.duration * (float)60);
+            ball.transform.position = new Vector3(bar.position.x - (bar.rect.width / 2), bar.position.y, 0);
+            ball.transform.Translate(new Vector3(bar.rect.width * factor, 0, 0));
+            snapimages.Add(ball);
+        }
+    }
+
     // Start is called before the first frame update
+    public void SetNoSpeed()
+    {
+        Play();
+    }
+    
+    public void SetTime(float value)
+    {
+        Play();
+        if (value >= previousTime)
+        {
+            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+            {
+                playing.simulationSpeedScale = -1;
+            }
+            SetImage(true, playImage);
+            SetImage(false, pauseImage);
+            SetImage(false, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioForward();
+            foreach (Material hover in hoverMaterials)
+            {
+                hover.SetFloat("_isOn", 0.0f);
+            }
+            foreach (WatterEffectHandler handler in watterhandlers)
+            {
+                handler.Toggle(true);
+            }
+        }
+        else
+        {
+            foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
+            {
+                playing.simulationSpeedScale = 1;
+            }
+            SetImage(false, playImage);
+            SetImage(false, pauseImage);
+            SetImage(true, rewindImage);
+            DOVirtual.Float(normalVolume.weight, 0, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
+            audioController.AudioReverse();
+            audioController.AudioToggle();
+            foreach (Material hover in hoverMaterials)
+            {
+                hover.SetFloat("_isOn", 0.0f);
+            }
+            foreach (WatterEffectHandler handler in watterhandlers)
+            {
+                handler.Toggle(true);
+            }
+        }
+        previousTime = value;
+        playableDirector.time = value;
+        Debug.Log(value);
+    }
+
+
     public void IgnoreTime(bool b)
     {
         ignoreTime = b;
@@ -158,6 +246,7 @@ public class TimelineControl : MonoBehaviour
         {
             hover.SetFloat("_isOn", 1.0f);
         }
+        snapimages = new List<GameObject>();
         slider.maxValue = (float)playableDirector.duration;
         slider.minValue = 0;
         slider.value = 0;
@@ -167,7 +256,7 @@ public class TimelineControl : MonoBehaviour
             float factor = (float)i / ((float)playableDirector.duration * (float)60);
             ball.transform.position = new Vector3(bar.position.x-(bar.rect.width/2), bar.position.y, 0);
             ball.transform.Translate(new Vector3(bar.rect.width*factor,0,0));
-
+            snapimages.Add(ball);
         }
 
         //Debug.Log(playableDirector.duration);

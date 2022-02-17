@@ -23,6 +23,38 @@ public class InteractionHandler : MonoBehaviour
     [SerializeField] private TimelineHandler[] timelineHandlers;
     [SerializeField] LayerMask raycastMask;
     private TimelineHandler collidedTimeline;
+    private int selectedrune;
+    [SerializeField] Image runeimage;
+    private void ChangeRuneImage(Sprite rune)
+    {
+        runeimage.sprite = rune;
+    }
+     
+    private Vector3 GetComponentInputPosition()
+    {
+        return Input.mousePosition;
+        //return Input.GetTouch(0).position;
+    }
+
+    private bool CanMove()
+    {
+        return true;
+        //return Input.touchCount > 0;
+    }
+
+    private bool CanSnap()
+    {
+        bool value = true;
+        if (Input.touchCount > 0)
+            value = false;
+        return value;
+    }
+
+    public void SelectRune(int index, Sprite rune)
+    {
+        selectedrune = index;
+        ChangeRuneImage(rune);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -32,13 +64,13 @@ public class InteractionHandler : MonoBehaviour
         SetTapImage(false);
         footSteps = new GameObject[FOOTCACHE];
         footCount = 0;
-        
+        selectedrune = - 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        bool isMoving = true;
+        /*bool isMoving = true;
         bool canRewind = true;
         bool canPlay = true;
         if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
@@ -50,9 +82,9 @@ public class InteractionHandler : MonoBehaviour
                     canRewind = false;
                 if (!controller.CanPlay())
                     canPlay = false;
-            }
+            }*/
 
-        if (isMoving)
+        if (CanMove())
         {
             if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
             {
@@ -75,15 +107,15 @@ public class InteractionHandler : MonoBehaviour
             }
             if (Input.GetButtonUp("Click"))
             {
-                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = playerCamera.ScreenPointToRay(GetComponentInputPosition());
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
                 {
-                    if(Time.realtimeSinceStartup - timeOnClick < holdTime)
-                    {
+                    /*if(Time.realtimeSinceStartup - timeOnClick < holdTime)
+                    {*/
                         pathfinder.Djikstra(hit);
                         //Debug.Log(pathFound.Count);
-                    }
+                    //}
                     
                 }
 
@@ -91,10 +123,10 @@ public class InteractionHandler : MonoBehaviour
         }
         if (Input.GetButtonDown("Click"))
         {
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+            /*Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;*/
             SetTapImage(true);
-            if(Physics.Raycast(ray, out hit)){
+            /*if(Physics.Raycast(ray, out hit)){
                 collidedTimeline = hit.collider.gameObject.GetComponent<TimelineHandler>();
             }
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
@@ -105,9 +137,9 @@ public class InteractionHandler : MonoBehaviour
                     Destroy(clickInstance);
                 clickInstance = Instantiate(clickFX, hit.point, Quaternion.identity, this.gameObject.transform.parent);
                 Debug.Log(timeOnClick);
-            }
+            }*/
         }
-        if (Input.GetButton("Click"))
+        /*if (Input.GetButton("Click"))
         {
             if (Time.realtimeSinceStartup - timeOnClick >= holdTime)
             {
@@ -150,17 +182,26 @@ public class InteractionHandler : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
         if (Input.GetButtonUp("Click"))
         {
             SetTapImage(false);
-            if (collidedTimeline != null&& Time.realtimeSinceStartup - timeOnClick >= holdTime)
+            /*if (collidedTimeline != null&& Time.realtimeSinceStartup - timeOnClick >= holdTime)
             {
                 collidedTimeline.Fast();
                 collidedTimeline = null;
-            }
+            }*/
+        }
+        if (CanSnap())
+        {
+            if (selectedrune >= 0 && selectedrune < timelineHandlers.Length)
+            {
+                timelineHandlers[selectedrune].Fast();
+            }   
         }
     }
+
+    
 
     private void SetWalkingImage(bool v)
     {
