@@ -34,6 +34,7 @@ public class TimelineControl : MonoBehaviour
     private const double TIMEFACTOR = 0.1;
     [SerializeField] private Material[] standards;
     [SerializeField] private Material[] hoverMaterials;
+    [SerializeField] private FloatArray[] hoverranges;
     private List<GameObject> snapimages;
     
 
@@ -48,7 +49,11 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] GameObject point;
     [SerializeField] RectTransform bar;
     [SerializeField] [Range(0, 1)]  private float tolerence = 1;
-    
+
+    [Serializable]
+    public class FloatArray{
+        public float[] array;
+    }
 
     private float previousTime;
     private float target;
@@ -102,10 +107,8 @@ public class TimelineControl : MonoBehaviour
             DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
             DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
             audioController.AudioForward();
-            foreach (Material hover in hoverMaterials)
-            {
-                hover.SetFloat("_isOn", 0.0f);
-            }
+            int i = 0;
+            HoverUpdate();
             foreach (WatterEffectHandler handler in watterhandlers)
             {
                 handler.Toggle(true);
@@ -125,10 +128,7 @@ public class TimelineControl : MonoBehaviour
             DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
             audioController.AudioReverse();
             audioController.AudioToggle();
-            foreach (Material hover in hoverMaterials)
-            {
-                hover.SetFloat("_isOn", 0.0f);
-            }
+            HoverUpdate();
             foreach (WatterEffectHandler handler in watterhandlers)
             {
                 handler.Toggle(true);
@@ -143,6 +143,28 @@ public class TimelineControl : MonoBehaviour
     public void IgnoreTime(bool b)
     {
         ignoreTime = b;
+    }
+
+    public void HoverUpdate()
+    {
+        int i = 0;
+        foreach (Material hover in hoverMaterials)
+        {
+            bool willHover = false;
+            if (hoverranges[i] != null)
+                for (int k = 0; k < hoverranges[i].array.Length-2; k +=2)
+                {
+                    if (hoverranges[i - 1].array[k] >= playableDirector.time * 60 && hoverranges[i - 1].array[k + 1] <= playableDirector.time * 60)
+                    {
+                        willHover = true;
+                    }
+                }
+            if (willHover)
+            {
+                hover.SetFloat("_isOn", 1.0f);
+            }
+            i++;
+        }
     }
 
     public void Pause()
@@ -160,11 +182,8 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(pauseVolume.weight, 1, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioStop();
-        foreach(Material hover in hoverMaterials)
-        {
-            hover.SetFloat("_isOn", 1.0f);
-        }
-        foreach(WatterEffectHandler handler in watterhandlers)
+        HoverUpdate();
+        foreach (WatterEffectHandler handler in watterhandlers)
         {
             handler.Toggle(false);
         }
@@ -186,11 +205,7 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(normalVolume.weight, 1, transitionDuration, normalVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
-        audioController.AudioForward();
-        foreach (Material hover in hoverMaterials)
-        {
-            hover.SetFloat("_isOn", 0.0f);
-        }
+        HoverUpdate();
         foreach (WatterEffectHandler handler in watterhandlers)
         {
             handler.Toggle(true);
@@ -214,10 +229,7 @@ public class TimelineControl : MonoBehaviour
         DOVirtual.Float(rewindVolume.weight, 1, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
         audioController.AudioReverse();
         audioController.AudioToggle();
-        foreach (Material hover in hoverMaterials)
-        {
-            hover.SetFloat("_isOn", 0.0f);
-        }
+        HoverUpdate();
         foreach (WatterEffectHandler handler in watterhandlers)
         {
             handler.Toggle(true);
@@ -241,19 +253,15 @@ public class TimelineControl : MonoBehaviour
 
         skyDome.SetTextureOffset("_MainTex",originalOffset);
         slider.maxValue = (float)playableDirector.duration;
-        
-        foreach (Material hover in hoverMaterials)
-        {
-            hover.SetFloat("_isOn", 1.0f);
-        }
+        HoverUpdate();
         snapimages = new List<GameObject>();
         slider.maxValue = (float)playableDirector.duration;
         slider.minValue = 0;
         slider.value = 0;
-        foreach (int i in snapshots)
+        foreach (int k in snapshots)
         {
             GameObject ball = Instantiate(point, bar.gameObject.transform);
-            float factor = (float)i / ((float)playableDirector.duration * (float)60);
+            float factor = (float)k / ((float)playableDirector.duration * (float)60);
             ball.transform.position = new Vector3(bar.position.x-(bar.rect.width/2), bar.position.y, 0);
             ball.transform.Translate(new Vector3(bar.rect.width*factor,0,0));
             snapimages.Add(ball);

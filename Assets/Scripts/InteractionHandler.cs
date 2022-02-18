@@ -32,14 +32,14 @@ public class InteractionHandler : MonoBehaviour
      
     private Vector3 GetComponentInputPosition()
     {
-        return Input.mousePosition;
-        //return Input.GetTouch(0).position;
+        //return Input.mousePosition;
+        return Input.GetTouch(0).position;
     }
 
     private bool CanMove()
     {
-        return true;
-        //return Input.touchCount > 0;
+        //return true;
+        return Input.touchCount > 0;
     }
 
     private bool CanSnap()
