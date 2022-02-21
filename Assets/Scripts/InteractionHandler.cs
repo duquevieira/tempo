@@ -32,18 +32,20 @@ public class InteractionHandler : MonoBehaviour
      
     private Vector3 GetComponentInputPosition()
     {
-        //return Input.mousePosition;
-        return Input.GetTouch(0).position;
+        return Input.mousePosition;
+        //Debug.DrawLine(Input.GetTouch(0).position, playerCamera.transform.position, Color.red);
+        //return Input.GetTouch(0).position;
     }
 
     private bool CanMove()
     {
-        //return true;
-        return Input.touchCount > 0;
+        return true;
+        //return Input.touchCount > 0;
     }
 
     private bool CanSnap()
     {
+        return false;
         bool value = true;
         if (Input.touchCount > 0)
             value = false;
@@ -88,6 +90,7 @@ public class InteractionHandler : MonoBehaviour
         {
             if (pathfinder.RemainingDistance() <= pathfinder.StoppingDistance())
             {
+                
                 if (pathfinder.PathAmount() > 0)
                 {
                     pathfinder.SetNextDestination();

@@ -51,6 +51,7 @@ public class Pathfinding : MonoBehaviour
 
     public int PathAmount()
     {
+        //Debug.Log(pathFound);
         return pathFound.Count;
     }
 
@@ -491,7 +492,7 @@ public class Pathfinding : MonoBehaviour
             //Debug.Log("found : " + current);
             if (current < 0)
             {
-                pathFound.Clear();
+              pathFound.Clear();
                 return;
             }
             pathFound.AddLast(nodesarray[current]);

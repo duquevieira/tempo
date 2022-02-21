@@ -374,6 +374,7 @@ public class TimelineControl : MonoBehaviour
                 foreach(Material standard in standards)
                 {
                     standard.SetFloat("_isOn", standard.GetFloat("_isOn") - (float)timeDifference*auxTimeFactor);
+
                 }
                 skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") - (skyDomeIncrement * (float)timeDifference));
             }

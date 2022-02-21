@@ -132,6 +132,8 @@ MonoBehaviour:
   Connections: []
   myPreFab: {fileID: 8981342775015900860}
   auto: 0
+  portal: {fileID: 0}
+  forward: {fileID: 0}
 --- !u!135 &-5722872683707195497
 SphereCollider:
   m_ObjectHideFlags: 0
