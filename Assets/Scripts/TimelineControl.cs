@@ -36,8 +36,8 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Material[] hoverMaterials;
     [SerializeField] private FloatArray[] hoverranges;
     private List<GameObject> snapimages;
-    
 
+    
     [SerializeField] WatterEffectHandler[] watterhandlers;
     [SerializeField] private ParticleSystemReverseSimulationSuperSimple[] playingParticles;
     [SerializeField] private int[] snapshots;
@@ -45,11 +45,13 @@ public class TimelineControl : MonoBehaviour
     [SerializeField] private Vector2 originalOffset;
     [SerializeField] private Vector2 skyDomeIncrement;
     [SerializeField] [Range(1,10)] private float fastForwardFactor = 2;
+    [SerializeField] GameObject parent;
     [SerializeField] Slider slider;
     [SerializeField] GameObject point;
-    [SerializeField] RectTransform bar;
+    [SerializeField] RectTransform min;
+    [SerializeField] RectTransform max;
     [SerializeField] [Range(0, 1)]  private float tolerence = 1;
-
+    
     [Serializable]
     public class FloatArray{
         public float[] array;
@@ -75,12 +77,13 @@ public class TimelineControl : MonoBehaviour
         slider.maxValue = (float)playableDirector.duration;
         slider.minValue = 0;
         slider.value = 0;
-        foreach (int i in snapshots)
+        foreach (int k in snapshots)
         {
-            GameObject ball = Instantiate(point, bar.gameObject.transform);
-            float factor = (float)i / ((float)playableDirector.duration * (float)60);
-            ball.transform.position = new Vector3(bar.position.x - (bar.rect.width / 2), bar.position.y, 0);
-            ball.transform.Translate(new Vector3(bar.rect.width * factor, 0, 0));
+            GameObject ball = Instantiate(point, parent.transform);
+            float factor = (float)k / ((float)playableDirector.duration * (float)60);
+            float width = max.position.x - min.position.x;
+            ball.transform.position = min.position;
+            ball.transform.Translate(new Vector3(width * factor, 0, 0));
             snapimages.Add(ball);
         }
     }
@@ -107,7 +110,6 @@ public class TimelineControl : MonoBehaviour
             DOVirtual.Float(pauseVolume.weight, 0, transitionDuration, pauseVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
             DOVirtual.Float(rewindVolume.weight, 0, transitionDuration, rewindVolumeWeight).SetUpdate(true).SetEase(Ease.InOutSine);
             audioController.AudioForward();
-            int i = 0;
             HoverUpdate();
             foreach (WatterEffectHandler handler in watterhandlers)
             {
@@ -260,10 +262,11 @@ public class TimelineControl : MonoBehaviour
         slider.value = 0;
         foreach (int k in snapshots)
         {
-            GameObject ball = Instantiate(point, bar.gameObject.transform);
+            GameObject ball = Instantiate(point, parent.transform);
             float factor = (float)k / ((float)playableDirector.duration * (float)60);
-            ball.transform.position = new Vector3(bar.position.x-(bar.rect.width/2), bar.position.y, 0);
-            ball.transform.Translate(new Vector3(bar.rect.width*factor,0,0));
+            float width = max.position.x - min.position.x;
+            ball.transform.position = min.position;
+            ball.transform.Translate(new Vector3(width*factor,0,0));
             snapimages.Add(ball);
         }
 

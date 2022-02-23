@@ -16,7 +16,7 @@ public class InteractionHandler : MonoBehaviour
     [SerializeField] private GameObject footStep;
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject clickFX;
-    [SerializeField] private float holdTime = 1;
+    //[SerializeField] private float holdTime = 1;
     private GameObject clickInstance;
     private Vector2 downClickPoint;
     private float timeOnClick;
@@ -25,11 +25,20 @@ public class InteractionHandler : MonoBehaviour
     private TimelineHandler collidedTimeline;
     private int selectedrune;
     [SerializeField] Image runeimage;
+    private bool ignoreRay;
+
     private void ChangeRuneImage(Sprite rune)
     {
         runeimage.sprite = rune;
     }
-     
+    
+    public void ToggleRaycast(bool value)
+    {
+        ignoreRay = value;
+        Debug.Log(value);
+    }
+
+
     private Vector3 GetComponentInputPosition()
     {
         return Input.mousePosition;
@@ -46,10 +55,10 @@ public class InteractionHandler : MonoBehaviour
     private bool CanSnap()
     {
         return false;
-        bool value = true;
+        /*bool value = true;
         if (Input.touchCount > 0)
             value = false;
-        return value;
+        return value;*/
     }
 
     public void SelectRune(int index, Sprite rune)
@@ -110,17 +119,21 @@ public class InteractionHandler : MonoBehaviour
             }
             if (Input.GetButtonUp("Click"))
             {
-                Ray ray = playerCamera.ScreenPointToRay(GetComponentInputPosition());
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
+                if (!ignoreRay)
                 {
-                    /*if(Time.realtimeSinceStartup - timeOnClick < holdTime)
-                    {*/
+                    Ray ray = playerCamera.ScreenPointToRay(GetComponentInputPosition());
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
+                    {
+                        /*if(Time.realtimeSinceStartup - timeOnClick < holdTime)
+                        {*/
                         pathfinder.Djikstra(hit);
                         //Debug.Log(pathFound.Count);
-                    //}
-                    
+                        //}
+
+                    }
                 }
+                
 
             }
         }
