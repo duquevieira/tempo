@@ -61,18 +61,16 @@ public class TimelineControl : MonoBehaviour
     private float target;
     private bool fastToggle;
     private bool ignoreTime;
-
+    private bool pauseBuffer;
     internal void ResetSlider()
     {
         foreach(GameObject i in snapimages)
         {
             Destroy(i);
         }
-        slider.gameObject.SetActive(false);//can not be disabled
     }
     public void InititalizeSlider()
     {
-        slider.gameObject.SetActive(true);//can not be anabled if not disabled
         snapimages = new List<GameObject>();
         slider.maxValue = (float)playableDirector.duration;
         slider.minValue = 0;
@@ -96,7 +94,7 @@ public class TimelineControl : MonoBehaviour
     
     public void SetTime(float value)
     {
-        Play();
+        playableDirector.Resume();
         if (value >= previousTime)
         {
             foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
@@ -269,7 +267,7 @@ public class TimelineControl : MonoBehaviour
             ball.transform.Translate(new Vector3(width*factor,0,0));
             snapimages.Add(ball);
         }
-
+        pauseBuffer = false;
         //Debug.Log(playableDirector.duration);
     }
 
@@ -349,7 +347,8 @@ public class TimelineControl : MonoBehaviour
         {
             if (playableDirector.time >= target - (timeDifference * auxTimeFactor)*tolerence && playableDirector.time <= target + (timeDifference * auxTimeFactor)*tolerence)
             {
-                playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
+                if(!playableDirector.playableGraph.GetRootPlayable(0).Equals(null))
+                    playableDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
                 Pause();
                 fastToggle = false;
                 
@@ -400,8 +399,21 @@ public class TimelineControl : MonoBehaviour
                 skyDome.SetTextureOffset("_MainTex", skyDome.GetTextureOffset("_MainTex") + (skyDomeIncrement*(float)timeDifference));
 
             }
-            slider.value = (float)playableDirector.time;
         }
+        else
+        {
+            if (pauseBuffer)
+            {
+                pauseBuffer = false;
+                playableDirector.Pause();
+            }
+            if (playableDirector.state.Equals(PlayState.Playing))
+            {
+                pauseBuffer = true;
+            }
+        }
+
+        slider.value = (float)playableDirector.time;
     }
 
     private void SetImage(bool v, Image img)

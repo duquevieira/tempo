@@ -21,11 +21,24 @@ public class InteractionHandler : MonoBehaviour
     private Vector2 downClickPoint;
     private float timeOnClick;
     [SerializeField] private TimelineHandler[] timelineHandlers;
+    [SerializeField] private TimelineHandler universalHandler;
     [SerializeField] LayerMask raycastMask;
     private TimelineHandler collidedTimeline;
     private int selectedrune;
     [SerializeField] Image runeimage;
     private bool ignoreRay;
+
+    public void SetTime(float value)
+    {
+        if (selectedrune >= 0 && selectedrune < timelineHandlers.Length)
+        {
+            timelineHandlers[selectedrune].SetTime(value);
+        }
+        else if(universalHandler!=null)
+        {
+            universalHandler.SetTime(value);
+        }
+    }
 
     private void ChangeRuneImage(Sprite rune)
     {
@@ -54,7 +67,8 @@ public class InteractionHandler : MonoBehaviour
 
     private bool CanSnap()
     {
-        return false;
+        return Input.GetButtonUp("Click");
+        //return Input.GetButtonUp("Click");
         /*bool value = true;
         if (Input.touchCount > 0)
             value = false;
@@ -63,8 +77,18 @@ public class InteractionHandler : MonoBehaviour
 
     public void SelectRune(int index, Sprite rune)
     {
+        timelineHandlers[selectedrune].Deactivate();
+        if (index >= 0)
+        {
+            universalHandler.Deactivate();
+        }
+        else
+        {
+            universalHandler.Initialize();
+        }
         selectedrune = index;
         ChangeRuneImage(rune);
+        timelineHandlers[selectedrune].Initialize();
     }
 
     // Start is called before the first frame update
@@ -213,7 +237,11 @@ public class InteractionHandler : MonoBehaviour
             if (selectedrune >= 0 && selectedrune < timelineHandlers.Length)
             {
                 timelineHandlers[selectedrune].Fast();
-            }   
+            }
+            else if (universalHandler != null)
+            {
+                universalHandler.Fast();
+            }
         }
     }
 

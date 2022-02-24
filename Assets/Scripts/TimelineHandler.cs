@@ -108,12 +108,28 @@ public class TimelineHandler : MonoBehaviour
         return result;
     }
 
+    internal void Initialize()
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.InititalizeSlider();
+        }
+    }
+
     public void Fast()
     {
         foreach (TimelineControl controller in timelineControllers)
         {
             controller.Fast();
             controller.IgnoreTime(false);
+        }
+    }
+
+    public void SetTime(float value)
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            controller.SetTime(value);
         }
     }
 }
