@@ -132,4 +132,14 @@ public class TimelineHandler : MonoBehaviour
             controller.SetTime(value);
         }
     }
+    
+    public bool IsFast()
+    {
+        foreach (TimelineControl controller in timelineControllers)
+        {
+            if (controller.isFast())
+                return true;
+        }
+        return false;
+    }
 }

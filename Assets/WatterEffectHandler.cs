@@ -46,15 +46,20 @@ public class WatterEffectHandler : MonoBehaviour
             float randomNum = Random.Range(0, 1f);
             if (randomNum < riples)
             {
-                float x = Random.Range(minX, maxX);
+                float width = maxX - minX;
+                float x = Random.Range(-width/2, width/2);
                 float y = maxY;
-                float z = Random.Range(minX, maxX);
+                float len = maxZ - minZ;
+                float z = Random.Range(-len/2, len/2);
                 if (cache[index] != null)
                 {
                     Destroy(cache[index]);
                 }
                 cache[index] = Instantiate(prefab, new Vector3(x, y, z), Quaternion.identity, transform);
                 cache[index].transform.localScale = scale;
+                cache[index].transform.position = new Vector3(x, 0, z);
+                Debug.Log(z);
+                cache[index].transform.Translate(gameObject.transform.position);
                 if (index == MAXCACHE - 1)
                 {
 

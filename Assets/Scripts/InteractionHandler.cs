@@ -27,17 +27,23 @@ public class InteractionHandler : MonoBehaviour
     private int selectedrune;
     [SerializeField] Image runeimage;
     private bool ignoreRay;
+    private bool fastActivator;
 
     public void SetTime(float value)
     {
+        bool aux = false;
         if (selectedrune >= 0 && selectedrune < timelineHandlers.Length)
         {
             timelineHandlers[selectedrune].SetTime(value);
+            aux = !timelineHandlers[selectedrune].IsFast();
         }
         else if(universalHandler!=null)
         {
             universalHandler.SetTime(value);
+            aux = !universalHandler.IsFast();
         }
+        if(aux)
+            fastActivator = true;
     }
 
     private void ChangeRuneImage(Sprite rune)
@@ -48,7 +54,7 @@ public class InteractionHandler : MonoBehaviour
     public void ToggleRaycast(bool value)
     {
         ignoreRay = value;
-        Debug.Log(value);
+        //Debug.Log(value);
     }
 
 
@@ -67,7 +73,13 @@ public class InteractionHandler : MonoBehaviour
 
     private bool CanSnap()
     {
-        return Input.GetButtonUp("Click");
+        if (Input.GetButtonUp("Click")&& fastActivator)
+        {
+            fastActivator = false;
+            ignoreRay = false;
+            return true;
+        }
+        return false;
         //return Input.GetButtonUp("Click");
         /*bool value = true;
         if (Input.touchCount > 0)
@@ -100,6 +112,7 @@ public class InteractionHandler : MonoBehaviour
         footSteps = new GameObject[FOOTCACHE];
         footCount = 0;
         selectedrune = - 1;
+        fastActivator = false;
     }
 
     // Update is called once per frame
@@ -143,7 +156,7 @@ public class InteractionHandler : MonoBehaviour
             }
             if (Input.GetButtonUp("Click"))
             {
-                if (!ignoreRay)
+                if (!(ignoreRay&&fastActivator))
                 {
                     Ray ray = playerCamera.ScreenPointToRay(GetComponentInputPosition());
                     RaycastHit hit;

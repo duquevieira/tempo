@@ -91,10 +91,16 @@ public class TimelineControl : MonoBehaviour
     {
         Play();
     }
-    
+
+    internal bool isFast()
+    {
+        return fastToggle;
+    }
+
     public void SetTime(float value)
     {
         playableDirector.Resume();
+        Debug.Log("SetTime");
         if (value >= previousTime)
         {
             foreach (ParticleSystemReverseSimulationSuperSimple playing in playingParticles)
@@ -192,6 +198,7 @@ public class TimelineControl : MonoBehaviour
     
     public void Play()
     {
+        Debug.Log("Play");
         isPaused = false;
         isRewinding = false;
         playableDirector.Resume();
@@ -288,6 +295,7 @@ public class TimelineControl : MonoBehaviour
 
     public void Fast()
     {
+        Debug.Log("Fast");
         fastToggle = true; 
         float auxMin = float.MaxValue;
         for(int i = 0; i<snapshots.Length;i++)

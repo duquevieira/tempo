@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6741196369917288113}
-  m_LocalRotation: {x: -0, y: -0, z: -0.000000022351736, w: 1}
+  m_LocalRotation: {x: -0.000000014901159, y: -0, z: -0.0000000372529, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -36,8 +36,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3.96344, y: -868.9852}
-  m_SizeDelta: {x: -141.7064, y: -1823.169}
+  m_AnchoredPosition: {x: -3.963745, y: -868.9851}
+  m_SizeDelta: {x: -141.70654, y: -1823.169}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3244949979998295254
 CanvasRenderer:
@@ -1055,3 +1055,53 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2999906873061781954, guid: dbc5dc9affb247e439b9596de3f11683, type: 3}
   m_PrefabInstance: {fileID: 3400051425827109309}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7032757613356477160 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5671781288922927957, guid: dbc5dc9affb247e439b9596de3f11683, type: 3}
+  m_PrefabInstance: {fileID: 3400051425827109309}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7690168129557335553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032757613356477160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: InteractionHandler, Assembly-CSharp
+          m_MethodName: ToggleRaycast
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: InteractionHandler, Assembly-CSharp
+          m_MethodName: ToggleRaycast
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
